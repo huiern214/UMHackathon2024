@@ -1,0 +1,213 @@
+import re
+from datetime import datetime
+from langchain_community.utilities.sql_database import SQLDatabase
+from langchain_core.messages import AIMessage, HumanMessage
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_core.runnables import RunnablePassthrough
+from langchain_core.output_parsers import StrOutputParser
+from langchain_openai import ChatOpenAI
+import firebase_admin
+from firebase_admin import credentials, firestore
+from config import OPENAI_API_KEY
+
+cred = credentials.Certificate("chatbot/firebase_key.json")
+firebase_admin.initialize_app(cred)
+firestore_client = firestore.client()
+db_uri = f"sqlite:///chatbot/data/database.sqlite3"
+db = SQLDatabase.from_uri(db_uri)
+API_KEY = OPENAI_API_KEY
+
+
+def get_search_results(userPrompt: str, tableId: int = 1):
+    # Get the schema
+    schema = db.get_table_info()
+    search_results = ""
+    search_results += f"Schema: {schema}\n"
+
+    # Get column names
+    query = "SELECT * FROM Transactions LIMIT 1;"
+    column_names = db._execute(query)[0].keys()
+
+    table_info = ""
+    table_dict = {}
+    for column in column_names:
+        if column == "transactionID" or column == "transactionTableID" or column == "withdrawalAmt" or column == "depositAmt":
+            continue
+        table_info += f"{column}: "
+        query = f"SELECT DISTINCT {column} FROM Transactions WHERE transactionTableID = {tableId};"
+        results = db._execute(query)
+        table_info += ", ".join([str(result.get(column))
+                                for result in results])
+        table_info += "\n"
+
+        table_dict[column] = [str(result.get(column)) for result in results]
+
+    # Search user prompt words in the 'Transactions'
+    words = re.findall(r'\w+', userPrompt)
+
+    # dict key with list
+    search_dict = {key: [] for key in table_dict.keys()}
+    search_dict["date"] = table_dict.get("date")
+    for word in words:
+        for key in table_dict.keys():
+            if key == "date":
+                continue
+            for item in table_dict.get(key):
+                # if item contains the word
+                if word.lower() in item.lower():
+                    search_dict.get(key).append(item)
+    search_results += "\nUser Prompt: " + userPrompt + "\n" + "Search Results for each column:\n" + \
+        "[column name: list of similar word search results from database]\n"
+
+    for key in search_dict.keys():
+        search_results += f"{key}: "
+        search_results += ", ".join(search_dict.get(key))
+        search_results += "\n"
+    return search_results
+
+
+def get_sql_chain():
+    template = """
+    {search_results}
+    \n\nYou are a data analyst that provides personalized questions and answers about personal finance. You are interacting with a user who is asking you questions about the personal transaction database.
+    Based on the table schema and similar word search results above, write a SQL query for 'Transactions' Table that would answer the user's question given that the TransactionTableID = {tableId}. Take the conversation history into account.
+
+    Conversation History: {chat_history}
+    
+    Write only the SQL query and nothing else. Do not wrap the SQL query in any other text, not even backticks.
+    
+    For example (trasactionTableID = 1):  
+    Question: What is my coffee salary spending for the last 1 year?
+    SQL Query: SELECT SUM(withdrawalAmt) AS coffee_spending FROM Transactions WHERE description = 'Expenses for coffee and snacks' AND date >= DATE('now', '-365 days') AND transactionTableID = 1;
+    Question: List the top 5 categories with the highest spending
+    SQL Query: SELECT category, SUM(withdrawalAmt) AS total_spending FROM Transactions WHERE transactionTableID = 1 GROUP BY category ORDER BY total_spending DESC LIMIT 5;
+    
+    Your turn:
+    
+    Question: {question}
+    SQL Query:
+    """
+    prompt = ChatPromptTemplate.from_template(template)
+    # llm = ChatGoogleGenerativeAI(model="gemini-pro")
+    # llm = ChatGroq(temperature=0, model_name="mixtral-8x7b-32768")
+    llm = ChatOpenAI(model_name="gpt-3.5-turbo",
+                     openai_api_key=API_KEY)
+
+    return (
+        prompt |
+        llm |
+        StrOutputParser()
+    )
+
+
+def print_get_Sql_chain(userPrompt, chat_history, tableId):
+    question = userPrompt
+    search_results = get_search_results(userPrompt, tableId)
+    sql_chain = get_sql_chain()
+
+    # Capture the generated SQL query
+    sql_query = sql_chain.invoke(
+        {"question": question, "chat_history": chat_history, "tableId": tableId, "search_results": search_results})
+
+    # Now you can use the sql_query string for further processing, like executing it on your database.
+    print(f"Generated SQL Query: {sql_query}")
+
+
+def get_response(user_query: str, chatId: str):
+    queryDocumentRef = firestore_client.collection("chats").document(chatId)
+    queryDocument = queryDocumentRef.get().to_dict()
+    messages = queryDocument.get("history", [])
+    userId = queryDocument.get("userId")
+    tableId = queryDocument.get("tableId")
+
+    # Append user message to messages list
+    chat_history = []
+
+    for message in messages:
+        if message.get("author") == "user":
+            chat_history.append(HumanMessage(content=message.get("content")))
+        elif message.get("author") == "bot":
+            chat_history.append(AIMessage(content=message.get("content")))
+
+    messages.append({"author": "user", "content": user_query,
+                    "timestamp": datetime.now()})
+    chat_history.append(HumanMessage(content=user_query))
+
+    sql_chain = get_sql_chain()
+
+    template = """
+    You are a data analyst that provides personalized questions and answers about personal finance. You are interacting with a user who is asking you questions about the personal transaction database.
+    Based on the table schema below, question, sql query, and sql response, write a natural language response. Avoid repeating the same information in the question and response. Avoid mentioning the transactionTableID and 'Based on the query you provided' in the response.
+    If the user asks for a list of transactions, list all without limit.
+    <SCHEMA>{schema}</SCHEMA>
+
+    Conversation History: {chat_history}
+    SQL Query: <SQL>{query}</SQL>
+    User question: {question}
+    SQL Response: {response}"""
+
+    prompt = ChatPromptTemplate.from_template(template)
+    # llm = ChatGoogleGenerativeAI(model="gemini-pro")
+    # llm = ChatGroq(temperature=0, model_name="mixtral-8x7b-32768")
+    llm = ChatOpenAI(model_name="gpt-3.5-turbo",
+                     openai_api_key=API_KEY)
+
+    chain = (
+        RunnablePassthrough.assign(query=sql_chain).assign(
+            schema=lambda _: db.get_table_info(),
+            response=lambda vars: db.run(vars["query"]),
+        )
+        | prompt
+        | llm
+        | StrOutputParser()
+    )
+
+    # print the generated SQL query
+    print_get_Sql_chain(user_query, chat_history, tableId)
+
+    bot_response = chain.invoke({
+        "chat_history": chat_history,
+        "question": user_query,
+        "tableId": tableId,
+        "search_results": get_search_results(user_query, tableId)
+    })
+
+    # Append bot message to messages list
+    chat_history.append(AIMessage(content=bot_response))
+    messages.append({"author": "bot", "content": bot_response,
+                    "timestamp": datetime.now()})
+
+    if bot_response:
+        queryDocumentRef.update({
+            "history": messages
+        })
+    return bot_response
+
+
+def create_new_chat(userId: int = 1, tableId: int = 1):
+    """Add a new chat document to the "chats" collection and return the document ID"""
+    query_collection = firestore_client.collection("chats")
+    query_document = query_collection.add({
+        "userId": userId,
+        "tableId": tableId,
+        "history": []
+    })
+    query_id = query_document[1].id
+    return query_id
+
+
+# chatId = create_new_chat(1, 3)
+chatId = "G29z15gR7MvP3FVlBni8"  # chatId for user 1 and table 1
+# chatId = "qwGFGMOFHpDDkhGgvFwO"  # chatId for user 1 and table 3
+
+# Question for table 1
+question = "What is my total coffee spending?"
+# question = "How much is my total salary for the last 5 months?"
+# question = "Can you list all the transactions for my monthly salary?"
+# question = "What is my total income?"
+# question = "What will be my spending like for next month? Provide me reasons for the spending."
+
+# Question for table 3
+# question = "May I know the total rent payments I earn?"
+print(get_response(question, chatId))
