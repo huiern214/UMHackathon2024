@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 from .service.chatbot import get_response, retrieve_all_tables, retrieve_chats_by_tableId, retrieve_chat_history
+from .service.fraudDetection import fraud_detection
 import json
 
 # Create your views here.
@@ -43,5 +44,15 @@ def retrieve_chatHistory(request):
     chatId = data.get('chatId', '')
     
     response = retrieve_chat_history(chatId)
+    
+    return JsonResponse({'response': response})
+  
+@csrf_exempt
+def fraudDetection(request):
+  if request.method == 'POST':
+    data = json.loads(request.body.decode('utf-8'))
+    tableId = data.get('tableId', 1)
+    
+    response = fraud_detection(tableId)
     
     return JsonResponse({'response': response})

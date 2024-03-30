@@ -12,3 +12,4 @@ supabase
 matplotlib
 django-cors-headers
 prophet
+openpyxl

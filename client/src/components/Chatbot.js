@@ -92,33 +92,6 @@ function Chatbot({
     const newConversation = [...conversation, newMessage];
     setConversation(newConversation);
 
-    try {
-      const input = {
-        userPrompt: message,
-        userId: 1,
-        tableId: selectedUser.tableId,
-        // "tableId": 1, // hardcoded for now
-        chatId: currentChatId,
-      };
-      const response = await api.post("/chatbot/generateChatResponse", input);
-
-      const botReponse = response.data.response.response;
-      const transactionData = response.data.response.transactionData;
-      const chatId = response.data.response.chatId;
-
-      if (currentChatId == "") {
-        setCurrentChatId(chatId);
-      }
-
-      const chatbotResponse = {
-        author: "bot",
-        content: botReponse,
-        timestamp: currentTime,
-      };
-
-      const newConversation = [...conversation, newMessage];
-      setConversation(newConversation);
-
       try {
         const input = {
           userPrompt: message,
@@ -127,29 +100,53 @@ function Chatbot({
           // "tableId": 1, // hardcoded for now
           chatId: currentChatId,
         };
-        console.log("input");
-        console.log(input);
-        const response = await api.post("/chatbot/generateChatResponse", input);
 
-        console.log(response.data);
-        const botReponse = response.data.response.response;
-        const transactionData = response.data.response.transactionData;
-        const chatId = response.data.response.chatId;
+        if (message.toLowerCase().includes("suspicious")) {
+          try {
+            const response = await api.post("/chatbot/fraudDetection", {
+              tableId: selectedUser.tableId,
+            });
+            const botReponse = response.data.response[0];
+            const transactionData = response.data.response[1];
 
-        if (currentChatId == "") {
-          setCurrentChatId(chatId);
-        }
+            // if (currentChatId == "") {
+            //   setCurrentChatId(chatId);
+            // }
+    
+            const chatbotResponse = {
+              author: "bot",
+              content: botReponse,
+              timestamp: currentTime,
+              transactionData: transactionData,
+            };
 
-        const chatbotResponse = {
-          author: "bot",
-          content: botReponse,
-          timestamp: currentTime,
-        };
+            const newConversation = [...conversation, newMessage, chatbotResponse];
+            setConversation(newConversation);
+          } catch (error) {
+            console.error(error);
+          }
+        } else {
+          console.log("input");
+          console.log(input);
+          const response = await api.post("/chatbot/generateChatResponse", input);
+
+          console.log(response.data);
+          const botReponse = response.data.response.response;
+          const transactionData = response.data.response.transactionData;
+          const chatId = response.data.response.chatId;
+
+          if (currentChatId == "") {
+            setCurrentChatId(chatId);
+          }
+  
+          const chatbotResponse = {
+            author: "bot",
+            content: botReponse,
+            timestamp: currentTime,
+            transactionData: transactionData,
+          };
+
         const generatedGraph = generateChatbotResponse(message); //Call generateChatbotResponse function
-
-        // if(message.containsKeyword("suspicious")){
-
-        // }
 
         // if generateChatbotResponse not return {}, then reamin the same, else use the response from generateChatbotResponse
         if (generatedGraph.content === undefined) {
@@ -162,8 +159,8 @@ function Chatbot({
 
         const newConversation = [...conversation, newMessage, chatbotResponse];
         setConversation(newConversation);
-
-        console.log(response.data.tables);
+        }
+        // console.log(response.data.tables);
       } catch (error) {
         console.error(error);
       }
@@ -194,9 +191,6 @@ function Chatbot({
       // setConversation(newConversation);
 
       setMessage("");
-    } catch (error) {
-      console.error(error);
-    }
   };
 
   //generateChatbotResponse function
@@ -306,7 +300,13 @@ function Chatbot({
                   <div className="ml-2">Quirx</div>
                 </div>
                 <div className="mt-3 ml-3 text-left animate-typing">
-                  {msg.content}
+                    {msg.content.split("\n").map((i, key) => {
+                      return (
+                        <p key={key} className="mb-1">
+                          {i}
+                        </p>
+                      );
+                    })}
                 </div>
                 {/* Render the graph based on chatbot's response */}
                 {msg.graphType && (
