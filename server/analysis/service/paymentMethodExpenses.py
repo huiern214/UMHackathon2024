@@ -17,10 +17,11 @@ def calculate_sum_by_payment_method(transaction_table_id, month):
         AND date >= '{start_date}' AND date <= '{end_date}'     
     GROUP BY "paymentMethod"
     """
-    response = supabase.table('Transactions').select(query).execute()
+    data, count = supabase.table('Transactions').select(query).execute()
 
-    if 'data' in response:
-        data = response['data']
+    if data[0] == 'data':
+        data = data[1]
+        # print(data)
 
         payment_methods = []
         total_expenses = {}

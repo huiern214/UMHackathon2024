@@ -8,5 +8,6 @@ Django
 psycopg2
 psycopg2-binary
 supabase_client
-supabase_py
+supabase
 matplotlib
+django-cors-headers

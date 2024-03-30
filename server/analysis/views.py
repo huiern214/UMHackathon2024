@@ -7,8 +7,6 @@ from .service.categoryExpensesByMonth import calculate_expenses_for_month
 from .service.paymentMethodExpenses import calculate_sum_by_payment_method
 
 # Create your views here.
-
-
 @csrf_exempt
 def calculateCategoryExpensesByMonth(request): # Top 5 categories
     if request.method == 'POST':
@@ -16,8 +14,6 @@ def calculateCategoryExpensesByMonth(request): # Top 5 categories
         tableId = data.get('tableId', '')
         month = data.get('month', '')
 
-        # Call your chatbot function and get the response
-        # response = generate_chat_response(user_prompt)
         response = calculate_expenses_for_month(tableId, month)
 
         # Return the response as JSON
@@ -49,3 +45,8 @@ def calculatePaymentMethodExpensesByMonth(request):
         return JsonResponse({'response': response})
 
     return JsonResponse({'error': 'Invalid request method'})
+
+# Test
+@csrf_exempt
+def test(request):
+    return JsonResponse({'response': 'Hello World!'})

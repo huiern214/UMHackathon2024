@@ -1,5 +1,5 @@
 import os
-from supabase_py import create_client
+from supabase import create_client
 
 def create_supabase_client():
     SUPABASE_URL = os.getenv('SUPABASE_URL', 'https://wupktfazlxaxtjozgjfc.supabase.co')

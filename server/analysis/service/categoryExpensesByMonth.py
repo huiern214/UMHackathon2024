@@ -1,4 +1,4 @@
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 from .create_client import create_supabase_client
 
 
@@ -18,11 +18,11 @@ def calculate_expenses_for_month(transaction_table_id, month):
         AND date >= '{start_date}' AND date <= '{end_date}'     
     GROUP BY "category"
     """
-    response = supabase.table('Transactions').select(query).execute()
+    data, count = supabase.table('Transactions').select(query).execute()
 
-    if 'data' in response:
-        data = response['data']
-        print(data)
+    if data[0] == 'data':
+        data = data[1]
+        # print(data)
         categories = []
         total_expenses = {}
 
@@ -62,7 +62,6 @@ def calculate_expenses_for_month(transaction_table_id, month):
 
     else:
         print("Failed to calculate expenses.")
-        print("Error:", response)
 
 
 # calculate_expenses_for_month(1, 1)
