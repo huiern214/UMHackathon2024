@@ -1,7 +1,14 @@
-import SendIcon from "../assets/SendIcon.png";
-import ArrowDown from "../assets/ArrowDown.png";
-import { useState, useEffect, useRef } from "react";
+import SendIcon from '../assets/SendIcon.png'
+import ArrowDown from '../assets/ArrowDown.png'
+import { useState, useEffect, useRef } from 'react'
 import api from "../api/axiosConfig";
+
+import PieChart from '../pages/Analysis/pieChart'
+import BarGraph from '../pages/Analysis/barGraph'
+import LineGraph from '../pages/Analysis/lineGraph'
+import SimplePieChart from '../pages/Analysis/simplePieChart'
+import { choose_graph } from '../pages/Analysis/graphUtils' //determine the graph type and generate the data
+
 
 function Chatbot({
   isSideBarHidden,
@@ -14,6 +21,7 @@ function Chatbot({
   setCurrentChatId,
 }) {
   let positionToLeft = isSideBarHidden ? "360px" : "80px";
+
 
   // const users= ['Ahmad', 'Bryan', 'Charles', 'Danish', 'Emily'];
   // const [selectedUser,setSelectedUser]=useState(users[0]);
@@ -72,94 +80,139 @@ function Chatbot({
     );
   };
 
-  const handleSend = async () => {
-    const currentTime = new Date().toLocaleTimeString();
-    const newMessage = {
-      author: "user",
-      content: message,
-      timestamp: currentTime,
-    };
-
-    const newConversation = [...conversation, newMessage];
-    setConversation(newConversation);
-
-    try {
-      const input = {
-        "userPrompt": message,
-        "userId": 1,
-        "tableId": selectedUser.tableId,
-        // "tableId": 1, // hardcoded for now
-        "chatId": currentChatId
-      }
-      console.log("input");
-      console.log(input);
-      const response = await api.post("/chatbot/generateChatResponse", 
-        input
-      );
-      
-      console.log(response.data);
-      const botReponse = response.data.response.response;
-      const transactionData = response.data.response.transactionData;
-      const chatId = response.data.response.chatId;
-
-      if (currentChatId == "") {
-        setCurrentChatId(chatId);
-      }
-
-      const chatbotResponse = {
-        author: "bot",
-        content: botReponse,
+    const handleSend = async () => {
+      const currentTime = new Date().toLocaleTimeString();
+      const newMessage = {
+        author: "user",
+        content: message,
         timestamp: currentTime,
       };
-
-      const newConversation = [...conversation, newMessage, chatbotResponse];
+  
+      const newConversation = [...conversation, newMessage];
       setConversation(newConversation);
-      
-      console.log(response.data.tables);
-    } catch (error) {
-      console.error(error);
-    }
+  
+      try {
+        const input = {
+          "userPrompt": message,
+          "userId": 1,
+          "tableId": selectedUser.tableId,
+          // "tableId": 1, // hardcoded for now
+          "chatId": currentChatId
+        }
+        console.log("input");
+        console.log(input);
+        const response = await api.post("/chatbot/generateChatResponse", 
+          input
+        );
+        
+        console.log(response.data);
+        const botReponse = response.data.response.response;
+        const transactionData = response.data.response.transactionData;
+        const chatId = response.data.response.chatId;
+  
+        if (currentChatId == "") {
+          setCurrentChatId(chatId);
+        }
+  
+        const chatbotResponse = {
+          author: "bot",
+          content: botReponse,
+          timestamp: currentTime,
+        };
+        const generatedGraph = generateChatbotResponse(message); //Call generateChatbotResponse function
 
-    // Example Bot Response
-    // "response": {
-    //   "response": "The coffee transaction data you requested includes two entries. The first transaction occurred on January 6th at a Coffee Shop, paid in cash for $20. The second transaction took place on January 8th at the same Coffee Shop, paid with a debit card for $15.",
-    //   "chatId": "2tltHUTArqqOJIatgM9J",
-    //   "transactionData": [
-    //       {
-    //           "transactionTableID": 1,
-    //           "transactionID": "TRX20220328123527",
-    //           "date": "2024-01-06",
-    //           "transactionDetails": "Coffee Shop",
-    //           "description": "Expenses for coffee and snacks",
-    //           "category": "Dining",
-    //           "paymentMethod": "Cash",
-    //           "withdrawalAmt": 20.0,
-    //           "depositAmt": null
-    //       },
+        // if generateChatbotResponse not return {}, then reamin the same, else use the response from generateChatbotResponse
+        if (generatedGraph .content === undefined) {
+          console.log("No graph to render");
+        } else {
+          chatbotResponse.content = generatedGraph.content;
+          chatbotResponse.graphType = generatedGraph.graphType;
+          chatbotResponse.data = generatedGraph.data;
+        }
 
-    // const chatbotResponse = {
-    //   text: "Chatbot response",
-    //   sender: "chatbot",
-    //   timeStamp: currentTime,
-    // };
-    // const newConversation = [...conversation, newMessage, chatbotResponse];
-    // setConversation(newConversation);
+        const newConversation = [...conversation, newMessage, chatbotResponse];
+        setConversation(newConversation);
+        
+        console.log(response.data.tables);
+      } catch (error) {
+        console.error(error);
+      }
+  
+      // Example Bot Response
+      // "response": {
+      //   "response": "The coffee transaction data you requested includes two entries. The first transaction occurred on January 6th at a Coffee Shop, paid in cash for $20. The second transaction took place on January 8th at the same Coffee Shop, paid with a debit card for $15.",
+      //   "chatId": "2tltHUTArqqOJIatgM9J",
+      //   "transactionData": [
+      //       {
+      //           "transactionTableID": 1,
+      //           "transactionID": "TRX20220328123527",
+      //           "date": "2024-01-06",
+      //           "transactionDetails": "Coffee Shop",
+      //           "description": "Expenses for coffee and snacks",
+      //           "category": "Dining",
+      //           "paymentMethod": "Cash",
+      //           "withdrawalAmt": 20.0,
+      //           "depositAmt": null
+      //       },
+  
+      // const chatbotResponse = {
+      //   text: "Chatbot response",
+      //   sender: "chatbot",
+      //   timeStamp: currentTime,
+      // };
+      // const newConversation = [...conversation, newMessage, chatbotResponse];
+      // setConversation(newConversation);
+  
+      setMessage("");
+    };
+  
 
-    setMessage("");
-  };
+    //generateChatbotResponse function
+    const generateChatbotResponse = (userInput) => {
+        const keywords = ['Show me', 'Plot', 'Display', 'Visualize', 'chart', 'graph', 'Illustrate']; // Keywords related to graph plotting
+        const containsKeyword = keywords.some(keyword => userInput.includes(keyword));
+    
+        if (containsKeyword) {
+          const { graphType, data } = choose_graph(userInput);
+          
+          // Log the data to check if it exists
+          console.log('Graph Data:', data);
 
-  useEffect(() => {
-    // Scroll to the bottom of the message container when conversation updates
-    if (messageContainerRef.current) {
-      messageContainerRef.current.scrollTop =
-        messageContainerRef.current.scrollHeight;
-    }
-  }, [conversation]);
+          // Log the labels and data for the pie chart
+          console.log('Pie Chart Labels:', data.labels);
+          console.log('Pie Chart Data:', data.data);
 
-  useEffect(() => {
-    setConversation([]);
-    setCurrentChatId("");
-  }, [selectedUser]);
+          return {
+            content: `Generating ${graphType} graph...`,
+            author: 'chatbot',
+            timestamp: new Date().toLocaleTimeString(),
+            graphType,
+            data,
+          };
+        } else {
+          return {
+          };
+        }
+      };
+
+    useEffect(() => {
+        // Scroll to the bottom of the message container when conversation updates
+        if (messageContainerRef.current) {
+          messageContainerRef.current.scrollTop = messageContainerRef.current.scrollHeight;
+        }
+        console.log(conversation)
+      }, [conversation]);
+    
+    useEffect(() => {
+      setConversation([])
+      setCurrentChatId([])
+    }, [selectedUser]);
+
+    // Function to add indices to labels
+    const addIndices = (labels) => {
+        return labels.map((label, index) => `${index + 1}. ${label}`);
+    };
+
 
   return (
     <div className="h-full grow relative">
@@ -210,9 +263,24 @@ function Chatbot({
                     {/* <img alt='user profile pic'/> */}
                   </div>
                   <div className="ml-2">Chatbot</div>
-                </div>
-                <div className="mt-3 ml-3 text-left">{msg.content}</div>
-              </div>
+                  </div>
+                    <div className="mt-3 ml-3 text-left">{msg.content}</div>
+                    {/* Render the graph based on chatbot's response */}
+                    {msg.graphType && (
+                      <div className='flex justify-center items-center mt-3'>
+                          {/* Render graph based on graphType */}
+                          {/* You can add logic here to render different types of graphs */}
+                          {/* Render PieChart */}
+                          {msg.graphType === 'pie' && (
+                          <div>
+                              <SimplePieChart labels={msg.data.labels} data={msg.data.data} />
+                          </div>
+                          )}
+                          {msg.graphType === 'bar' && <div><BarGraph labels={msg.data.labels} data={msg.data.data}/></div>}
+                          {msg.graphType === 'line' && <div><LineGraph data={msg.data}/></div>}
+                      </div>
+                    )}
+                  </div>
             )
           )}
         </div>

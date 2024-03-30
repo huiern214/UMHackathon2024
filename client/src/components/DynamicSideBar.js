@@ -6,7 +6,7 @@ import { ReactComponent as XMark } from "../assets/xmark.svg";
 import Chatbot from "./Chatbot";
 import { useState, useEffect } from "react";
 import { FaPlus, FaArrowDown, FaArrowUp } from "react-icons/fa";
-import PieChart from "./pieChart";
+import PieChart from "../pages/Analysis/pieChart";
 import api from "../api/axiosConfig";
 
 function DynamicSideBar({
@@ -448,135 +448,12 @@ function DynamicSideBar({
                 Describe the transaction.
               </p>
             </div>
-
-            <div className="mt-5 ml-10 sm:col-span-3">
-              <label
-                htmlFor="category"
-                className="block text-sm font-medium leading-6 text-gray-900"
-              >
-                Category
-              </label>
-              <div className="mt-2">
-                <select
-                  id="category"
-                  name="category"
-                  className="block w-full rounded-md border-0 py-1.5 pl-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-blue-500 sm:max-w-xs sm:text-sm sm:leading-6"
-                  required
-                >
-                  <option value="">Select Category</option>
-                  <option value="Debts/Overpayments">Debts/Overpayments</option>
-                  <option value="Dining">Dining</option>
-                  <option value="Education">Education</option>
-                  <option value="Entertainment">Entertainment</option>
-                  <option value="Government Services">
-                    Government Services
-                  </option>
-                  <option value="Groceries">Groceries</option>
-                  <option value="Health & Fitness">Health & Fitness</option>
-                  <option value="Income/Salary">Income/Salary</option>
-                  <option value="Insurance">Insurance</option>
-                  <option value="Investment">Investment</option>
-                  <option value="Other Expenses">Other Expenses</option>
-                  <option value="Savings">Savings</option>
-                  <option value="Shopping">Shopping</option>
-                  <option value="Transportation">Transportation</option>
-                  <option value="Travel">Travel</option>
-                  <option value="Utilities">Utilities</option>
-                </select>
-              </div>
-            </div>
-
-            <div className="mt-5 ml-10 sm:col-span-3">
-              <label
-                htmlFor="paymentMethod"
-                className="block text-sm font-medium leading-6 text-gray-900"
-              >
-                Payment Method
-              </label>
-              <div className="mt-2">
-                <select
-                  id="paymentMethod"
-                  name="paymentMethod"
-                  className="block w-full rounded-md border-0 py-1.5 pl-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-blue-500 sm:max-w-xs sm:text-sm sm:leading-6"
-                  required
-                >
-                  <option value="">Select Payment Method</option>
-                  <option value="Bank transfer">Bank transfer</option>
-                  <option value="Card payment">Card payment</option>
-                  <option value="Cash">Cash</option>
-                  <option value="Cheque">Cheque</option>
-                  <option value="Credit card">Credit card</option>
-                  <option value="Debit Card">Debit card</option>
-                  <option value="Direct debit">Direct debit</option>
-                  <option value="Online banking">Online banking</option>
-                  <option value="Online payment">Online payment</option>
-                </select>
-              </div>
-            </div>
-
-            <div className="mt-5 ml-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
-              <div className="sm:col-span-4">
-                <label
-                  htmlFor="withdrawalAmt"
-                  className="block text-sm font-medium leading-6 text-gray-900"
-                >
-                  Withdrawal Amount
-                </label>
-                <div className="mt-2">
-                  <div className="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-blue-500 sm:max-w-md">
-                    <input
-                      type="number"
-                      name="withdrawalAmt"
-                      id="withdrawalAmt"
-                      step="0.01"
-                      className="block flex-1 border-0 bg-transparent py-1.5 pl-3 text-gray-900 placeholder:text-gray-400 focus:ring-0  sm:text-sm   sm:leading-6"
-                      required
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="mt-5 ml-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
-              <div className="sm:col-span-4">
-                <label
-                  htmlFor="depositAmt"
-                  className="block text-sm font-medium leading-6 text-gray-900"
-                >
-                  Deposit Amount
-                </label>
-                <div className="mt-2">
-                  <div className="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-blue-500 sm:max-w-md">
-                    <input
-                      type="number"
-                      name="depositAmt"
-                      id="depositAmt"
-                      step="0.01"
-                      className="block flex-1 border-0 bg-transparent py-1.5 pl-3 text-gray-900 placeholder:text-gray-400 focus:ring-0  sm:text-sm   sm:leading-6"
-                      required
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="my-6 mr-10 flex items-center justify-end gap-x-6">
-              <button
-                type="button"
-                className="rounded-md text-sm px-3 py-2 font-semibold leading-6 text-gray-900 hover:bg-gray-300 hover:border hover:border-black"
-                onClick={handleUserAddTransactions}
-              >
-                Cancel
-              </button>
-              <button className="rounded-md bg-primary px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                Save
-              </button>
-            </div>
           </form>
         </div>
       </div>
-    );
-  };
+        )
+    }
+
 
   const UploadTransactionSideBar = () => {
     return (
@@ -631,89 +508,122 @@ function DynamicSideBar({
     );
   };
 
-  const AnalysisSideBar = () => {
-    const [selectedMonth, setSelectedMonth] = useState("January"); // Initial selected month state
+  const AnalysisSideBar=()=>{
+    const [selectedMonth1, setSelectedMonth1] = useState(1); // Initial selected month state for pie1
+    const [selectedMonth2, setSelectedMonth2] = useState(1); // Initial selected month state for pie2
+    const [chartData, setChartData] = useState({
+        "Other Expenses": 242385.91,
+        "Government Services": 78652.37,
+        "Utilities": 32814.15,
+        "Debts/Overpayments": 31770.46,
+        "Insurance": 11530
+    }); // Initial dummy data for pie chart
 
     // Define an array of months for the dropdown options
-    const months = ["January", "February", "March"];
+    const months = ['January', 'February', 'March'];
 
-    // Function to handle the change in the selected month
-    const handleMonthChange = (event) => {
-      setSelectedMonth(event.target.value);
+    // Function to handle the change in the selected month for pie1
+    const handleMonthChange1 = async (event) => {
+      setSelectedMonth1(parseInt(event.target.value));
+      console.log("selectMonth1",selectedMonth1)
+      
+      try {
+        const input = { "tableId": selectedUser.tableID, "month": selectedMonth1 }
+        console.log("heyy",input);
+        const response = await api.post("/analysis/categoryExpensesByMonth", 
+          input
+        );
+        console.log(response.data);
+        setChartData(response.data);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    // Function to handle the change in the selected month for pie2
+    const handleMonthChange2 = async (event) => {
+      setSelectedMonth2(parseInt(event.target.value));
+      
+      try {
+        const input = { "tableId": selectedUser.tableID, "month": selectedMonth2 }
+        console.log("heyy",input);
+        const response = await api.post("/analysis/paymentMethodExpensesByMonth", 
+          input
+        );
+        console.log(response.data);
+        setChartData(response.data);
+      } catch (error) {
+        console.error(error);
+      }
     };
 
     // Define the handlePrediction function
     const handlePrediction = () => {
-      // Logic for prediction goes here
-      console.log("Predicting expenses for next month...");
+        // Logic for prediction goes here
+        console.log('Predicting expenses for next month...');
     };
 
+    useEffect(() => {
+    }, [selectedMonth1, selectedMonth2]);
+
     return (
-      <div className="flex flex-col justify-center items-center">
+        <div className='flex flex-col justify-center items-center'>
         <button
-          onClick={handlePrediction}
-          className="mt-4 mb-4"
-          style={{
-            border: "1px solid black",
-            padding: "4px 8px",
-            borderRadius: "4px",
-            backgroundColor: "transparent",
-            cursor: "pointer",
-          }}
+            onClick={handlePrediction}
+            className='mt-4 mb-4'
+            style={{
+            border: '1px solid black',
+            padding: '4px 8px',
+            borderRadius: '4px',
+            backgroundColor: 'transparent',
+            cursor: 'pointer',
+            }}
         >
-          Predict Next Month Expenses
+            Predict Next Month Expenses
         </button>
 
         <div>
-          <h3 className="font-bold">Top 5 Category Expenses by Month</h3>
-          <div>
-            <label htmlFor="monthSelect">Select Month:</label>
-            <select
-              id="monthSelect"
-              value={selectedMonth}
-              onChange={handleMonthChange}
-            >
-              {months.map((month) => (
-                <option key={month} value={month}>
-                  {month}
-                </option>
+            <h3 className="font-bold">Top 5 Category Expenses by Month</h3>
+            <div>
+            <label htmlFor="monthSelect1">Select Month:</label>
+            <select id="monthSelect1" value={selectedMonth1} onChange={handleMonthChange1}>
+                {/* {months.map((month) => (
+                <option key={month} value={month}>{month}</option>
+                ))} */}
+              {months.map((month, index) => (
+                <option key={index+1} value={index+1}>{month}</option>
               ))}
             </select>
-          </div>
-          <div>
-            <PieChart id="pie1" />
-          </div>
+            </div>
+            <div>
+            <PieChart id="pie1" data={chartData} />
+            </div>
         </div>
 
-        <div className="mt-5">
-          <h3 className="font-bold">Top 5 Category Expenses by Month</h3>
-          <div>
-            <label htmlFor="monthSelect">Select Month:</label>
-            <select
-              id="monthSelect"
-              value={selectedMonth}
-              onChange={handleMonthChange}
-            >
-              {months.map((month) => (
-                <option key={month} value={month}>
-                  {month}
-                </option>
+        <div className='mt-5'>
+            <h3 className="font-bold">Top 5 Category Expenses by Month</h3>
+            <div>
+            <label htmlFor="monthSelect2">Select Month:</label>
+            <select id="monthSelect2" value={selectedMonth2} onChange={handleMonthChange2}>
+                {/* {months.map((month) => (
+                <option key={month} value={month}>{month}</option>
+                ))} */}
+              {months.map((month, index) => (
+                <option key={index+1} value={index+1}>{month}</option>
               ))}
             </select>
-          </div>
-          <div>
-            <PieChart id="pie2" />
-          </div>
+            </div>
+            <div>
+            <PieChart id="pie2" data={chartData} />
+            </div>
         </div>
-      </div>
+        </div>
     );
-  };
+    }
 
-
-  const ChatHistorySideBar = () => {
-
+  const ChatHistorySideBar = () => {   
     const [allChat, setAllChat] = useState([]);
-    
+
     const OpenNewChat = () => {
       const newChat = {
         chatId: "",
@@ -748,6 +658,8 @@ function DynamicSideBar({
       fetchAllChats();
     }
     ,[selectedUser]);
+    
+    
 
     return (
       <div

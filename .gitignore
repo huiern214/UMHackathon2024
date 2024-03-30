@@ -2,3 +2,6 @@
 server/*/__pycache__
 server/*/*/__pycache__
 server/chatbot/service/config.py
+node_modules
+package-lock.json
+package.json
