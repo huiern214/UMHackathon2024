@@ -23,7 +23,7 @@ export default function Register() {
 
       if (response.status === 200) {
         toast.success('Successfully registered user');
-        navigate(`/login`, { replace: true });
+        navigate(`/`, { replace: true });
       }
     } catch (error) {
       console.log(error);
