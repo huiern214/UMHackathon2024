@@ -2,11 +2,14 @@ import { AiOutlineSend } from "react-icons/ai";
 import { BiSolidCamera } from "react-icons/bi";
 import { MdKeyboardVoice } from "react-icons/md";
 import { GrAttachment } from "react-icons/gr";
+import { RiFileExcel2Line } from "react-icons/ri";
 import ArrowDown from "../assets/ArrowDown.png";
 import profilePhoto from "../assets/profilePhoto.png";
 import circleLogo from "../assets/circleLogo.png";
 import { useState, useEffect, useRef } from "react";
 import api from "../api/axiosConfig";
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
 
 import PieChart from "../pages/Analysis/pieChart";
 import BarGraph from "../pages/Analysis/barGraph";
@@ -249,6 +252,25 @@ function Chatbot({
     return labels.map((label, index) => `${index + 1}. ${label}`);
   };
 
+  const handleExport = ({ excel }) => {
+    const filename = "download.xlsx";
+    const workbook = XLSX.utils.book_new();
+    const worksheet = XLSX.utils.json_to_sheet(excel);
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
+    const excelBuffer = XLSX.write(workbook, {
+      bookType: "xlsx",
+      type: "array",
+    });
+    const file = new Blob([excelBuffer], { type: "application/octet-stream" });
+    saveAs(file, filename);
+  };
+
+  const excel = [
+    { id: 1, name: "John Doe", age: 30 },
+    { id: 2, name: "Jane Smith", age: 25 },
+    // Add more data as needed
+  ];
+
   return (
     <div className="h-full grow relative">
       <div
@@ -297,7 +319,14 @@ function Chatbot({
                   <div className="ml-2 w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center">
                     <img src={circleLogo} className="rounded-full" />
                   </div>
-                  <div className="ml-2">Quirx</div>
+                  <div className="mx-2 mr-8">Quirx</div>
+                  <btn
+                    className="flex p-1 border border-black rounded-xl justify-center items-center hover:bg-gray-200 animate-bounce"
+                    onClick={() => handleExport({ excel })}
+                  >
+                    <RiFileExcel2Line className="h-8 w-8 pr-2" />
+                    Export
+                  </btn>
                 </div>
                 <div className="mt-3 ml-3 text-left animate-typing">
                     {msg.content.split("\n").map((i, key) => {
