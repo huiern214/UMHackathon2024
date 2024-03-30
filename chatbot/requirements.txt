@@ -1,0 +1,6 @@
+pandas
+langchain_core
+langchain_openai
+langchain_google_genai
+langchain_community
+firebase_admin
