@@ -518,6 +518,13 @@ function DynamicSideBar({
         "Debts/Overpayments": 31770.46,
         "Insurance": 11530
     }); // Initial dummy data for pie chart
+    const [chartData2, setChartData2] = useState({
+      "Other Expenses": 242385.91,
+      "Government Services": 78652.37,
+      "Utilities": 32814.15,
+      "Debts/Overpayments": 31770.46,
+      "Insurance": 11530
+    }); // Initial dummy data for pie chart
 
     // Define an array of months for the dropdown options
     const months = ['January', 'February', 'March'];
@@ -533,8 +540,8 @@ function DynamicSideBar({
         const response = await api.post("/analysis/categoryExpensesByMonth", 
           input
         );
-        console.log(response.data);
-        setChartData(response.data);
+        console.log(response.data.response);
+        setChartData(response.data.response);
       } catch (error) {
         console.error(error);
       }
@@ -550,8 +557,8 @@ function DynamicSideBar({
         const response = await api.post("/analysis/paymentMethodExpensesByMonth", 
           input
         );
-        console.log(response.data);
-        setChartData(response.data);
+        console.log(response.data.response);
+        setChartData2(response.data.response);
       } catch (error) {
         console.error(error);
       }
@@ -564,6 +571,8 @@ function DynamicSideBar({
     };
 
     useEffect(() => {
+      handleMonthChange1({ target: { value: selectedMonth1 } });
+      handleMonthChange2({ target: { value: selectedMonth2 } });
     }, [selectedMonth1, selectedMonth2]);
 
     return (
@@ -614,7 +623,7 @@ function DynamicSideBar({
             </select>
             </div>
             <div>
-            <PieChart id="pie2" data={chartData} />
+            <PieChart id="pie2" data={chartData2} />
             </div>
         </div>
         </div>
