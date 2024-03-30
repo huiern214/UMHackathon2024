@@ -25,48 +25,48 @@ function DynamicSideBar({
   const [isShowTransactionTable, setIsShowTransactionTable] = useState(false);
   const [transactionTableUser, setTransactionTableUser] =
     useState(selectedUser);
-  const transactions = [
-    {
-      transactionID: "TRX20220328123461",
-      date: "2024-01-01",
-      transactionDetails: "Fund Transfer From Bank Rakyat",
-      description: "Transfer of funds from Bank Rakyat",
-      category: "Income/Salary",
-      paymentMethod: "Bank Transfer",
-      withdrawalAmt: 0,
-      depositAmt: 100000,
-    },
-    {
-      transactionID: "TRX20220328123467",
-      date: "2024-01-01",
-      transactionDetails: "fund transfer",
-      description: "Transfer of funds from Bank Rakyat",
-      category: "income/salary",
-      paymentMethod: "Bank Transfer",
-      withdrawalAmt: 772.0,
-      depositAmt: 1000000,
-    },
-    {
-      transactionID: "000001",
-      date: "1-Jan-24",
-      transactionDetails: "fund transfer",
-      description: "Transfer of funds from Bank Rakyat",
-      category: "income/salary",
-      paymentMethod: "Bank Transfer",
-      withdrawalAmt: 772.0,
-      depositAmt: 1000000,
-    },
-    {
-      transactionID: "000001",
-      date: "1-Jan-24",
-      transactionDetails: "fund transfer",
-      description: "Transfer of funds from Bank Rakyat",
-      category: "income/salary",
-      paymentMethod: "Bank Transfer",
-      withdrawalAmt: 772.0,
-      depositAmt: 1000000,
-    },
-  ];
+  // const transactions = [
+  //   {
+  //     transactionID: "TRX20220328123461",
+  //     date: "2024-01-01",
+  //     transactionDetails: "Fund Transfer From Bank Rakyat",
+  //     description: "Transfer of funds from Bank Rakyat",
+  //     category: "Income/Salary",
+  //     paymentMethod: "Bank Transfer",
+  //     withdrawalAmt: 0,
+  //     depositAmt: 100000,
+  //   },
+  //   {
+  //     transactionID: "TRX20220328123467",
+  //     date: "2024-01-01",
+  //     transactionDetails: "fund transfer",
+  //     description: "Transfer of funds from Bank Rakyat",
+  //     category: "income/salary",
+  //     paymentMethod: "Bank Transfer",
+  //     withdrawalAmt: 772.0,
+  //     depositAmt: 1000000,
+  //   },
+  //   {
+  //     transactionID: "000001",
+  //     date: "1-Jan-24",
+  //     transactionDetails: "fund transfer",
+  //     description: "Transfer of funds from Bank Rakyat",
+  //     category: "income/salary",
+  //     paymentMethod: "Bank Transfer",
+  //     withdrawalAmt: 772.0,
+  //     depositAmt: 1000000,
+  //   },
+  //   {
+  //     transactionID: "000001",
+  //     date: "1-Jan-24",
+  //     transactionDetails: "fund transfer",
+  //     description: "Transfer of funds from Bank Rakyat",
+  //     category: "income/salary",
+  //     paymentMethod: "Bank Transfer",
+  //     withdrawalAmt: 772.0,
+  //     depositAmt: 1000000,
+  //   },
+  // ];
 
   // const [chatHistory, setChatHistory] = useState([
   //   {
@@ -96,10 +96,24 @@ function DynamicSideBar({
   //   },
   // ]);
 
-  const UserTransactionTable = ({ transactionItems, searchQuery }) => {
-    const [sortedItems, setSortedItems] = useState(
-      transactionItems.sort((a, b) => new Date(b.date) - new Date(a.date))
-    );
+  const UserTransactionTable = () => {
+    const [transactions, setTransactions] = useState([]);
+    useEffect(() => {
+      const fetchTransactions = async () => {
+        console.log("fetching transactions");
+        try {
+          const response = await api.get(
+            "transaction/transactions?transactionTableID=1"
+          );
+          setTransactions(response.data.response);
+        } catch (error) {
+          console.error("Error fetching transactions:", error);
+        }
+      };
+      console.log("transactions:", transactions);
+      fetchTransactions();
+    }, []);
+    const [sortedItems, setSortedItems] = useState(transactions);
     const [sortConfig, setSortConfig] = useState({
       transactionID: "ascending",
       date: null,
@@ -147,9 +161,9 @@ function DynamicSideBar({
       updateDictionary(key, direction);
     };
     return (
-      <div className="fixed inset-0 flex flex-col w-full bg-gray-800 bg-opacity-50 z-50">
-        <div className="overflow-x-auto flex flex-col flex-1 mx-3 shadow-md sm:rounded-lg justify-center items-center">
-          <div className="rounded-xl border border-black flex flex-col bg-gray-50 items-center justify-center p-1">
+      <div className="fixed inset-0 flex flex-col w-full bg-gray-800 bg-opacity-50 z-50 justify-center items-center">
+        <div className="overflow-x-auto max-h-[70%] overflow-y flex flex-col flex-1 mx-3 shadow-md sm:rounded-lg items-center">
+          <div className="rounded-xl border  border-black flex flex-col bg-gray-50 items-center justify-center p-1">
             <table className="table-auto text-sm text-right rtl:text-right text-gray-500 dark:text-gray-400">
               <caption className="py-3 bg-gray-50 font-semibold text-xl text-black">
                 {transactionTableUser}'s Transactions
@@ -264,7 +278,7 @@ function DynamicSideBar({
                 </tr>
               </thead>
               <tbody>
-                {sortedItems.map((item, index) => (
+                {transactions.map((item, index) => (
                   <tr>
                     {/* transactionID, date, transactionDetails, description, category, paymentMethod, withdrawalAmt, depositAmt */}
                     <td className="px-2 py-2 bg-gray-50">
@@ -595,9 +609,7 @@ function DynamicSideBar({
         className="overflow-y-auto"
         style={{ display: isSideBarHidden ? "none" : "block" }}
       >
-        {isShowTransactionTable && (
-          <UserTransactionTable transactionItems={transactions} />
-        )}
+        {isShowTransactionTable && <UserTransactionTable />}
         {isAddTransaction && <AddTransactionWindow />}
         {isUserTransactionDropDown.map((user, index) => (
           <div className="flex flex-col my-5">
@@ -786,7 +798,7 @@ function DynamicSideBar({
         </button>
         <div className="flex flex-col w-full">
           {allChat.length > 0 ? (
-            <div className="flex flex-col w-full my-2">
+            <div className="flex flex-col w-full m-2">
               <div>Chat Session</div>
               {allChat.map((chat, index) => (
                 <IndividualChatHistory
@@ -822,11 +834,13 @@ function DynamicSideBar({
   const IndividualChatHistory = ({ chatTitle, chatId }) => {
     return (
       <button
-        className="flex w-fit items-center pr-10 my-1 hover:bg-gray-300 hover:border rounded-lg"
+        className="p-2 flex w-fit items-center hover:bg-gray-300 hover:border rounded-lg"
         onClick={() => openConversation(chatId)}
       >
         <img src={ChatIcon} alt="chat" className="h-4 w-4 mt-1" />
-        <div className="ml-2">{chatTitle ? chatTitle : "New Chat"}</div>
+        <div className="ml-2 text-start">
+          {chatTitle ? chatTitle : "New Chat"}
+        </div>
       </button>
     );
   };

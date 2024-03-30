@@ -1,5 +1,10 @@
-import SendIcon from "../assets/SendIcon.png";
+import { AiOutlineSend } from "react-icons/ai";
+import { BiSolidCamera } from "react-icons/bi";
+import { MdKeyboardVoice } from "react-icons/md";
+import { GrAttachment } from "react-icons/gr";
 import ArrowDown from "../assets/ArrowDown.png";
+import profilePhoto from "../assets/profilePhoto.png";
+import circleLogo from "../assets/circleLogo.png";
 import { useState, useEffect, useRef } from "react";
 import api from "../api/axiosConfig";
 
@@ -190,7 +195,7 @@ function Chatbot({
                 <div className="flex justify-end items-center">
                   <div className="">You</div>
                   <div className="ml-5 w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center">
-                    {/* <img alt='user profile pic'/> */}
+                    <img src={profilePhoto} className="rounded-full" />
                   </div>
                 </div>
                 <div className="mt-3 mr-2 text-right">{msg.content}</div>
@@ -200,23 +205,40 @@ function Chatbot({
               <div className="flex flex-col w-full h-fit mt-2">
                 <div className="flex items-center">
                   <div className="ml-2 w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center">
-                    {/* <img alt='user profile pic'/> */}
+                    <img src={circleLogo} className="rounded-full" />
                   </div>
-                  <div className="ml-2">Chatbot</div>
+                  <div className="ml-2">Quirx</div>
                 </div>
-                <div className="mt-3 ml-3 text-left">{msg.content}</div>
+                <div className="mt-3 ml-3 text-left animate-typing">
+                  {msg.content}
+                </div>
               </div>
             )
           )}
         </div>
         <div
           id="inputSession"
-          className="border flex w-full mb-5 border-gray-600 rounded-xl"
+          className="border flex w-full mb-2 border-gray-600 rounded-xl"
         >
+          <button className="p-2">
+            <div>
+              <MdKeyboardVoice className="w-8 h-8" />
+            </div>
+          </button>
+          {/* <button className="p-2">
+            <div>
+              <BiSolidCamera className="w-8 h-8" />
+            </div>
+          </button>
+          <button className="p-2">
+            <div>
+              <GrAttachment className="w-8 h-8" />
+            </div>
+          </button> */}
           <textarea
             value={message}
             onChange={handleChange}
-            className="w-[93%] resize-none text-base rounded-xl text-black rows-3 items-center justify-center p-2"
+            className="w-[93%] resize-none text-base rounded-xl text-black items-center justify-center p-2 focus:outline-none"
             placeholder="What is your inquiry?"
             onKeyDown={(e) => {
               if (e.key === "Enter" && !e.shiftKey) {
@@ -226,7 +248,9 @@ function Chatbot({
             }}
           />
           <button className="p-2" onClick={handleSend}>
-            <img src={SendIcon} className="w-8 h-8" alt="send icon" />
+            <div>
+              <AiOutlineSend className="w-8 h-8" />
+            </div>
           </button>
         </div>
       </div>
