@@ -26,6 +26,7 @@ function Chatbot({
   setConversation,
   currentChatId,
   setCurrentChatId,
+  setIsFetchData,
 }) {
   let positionToLeft = isSideBarHidden ? "360px" : "80px";
 
@@ -46,6 +47,7 @@ function Chatbot({
   };
 
   const handleSelectedUser = (user) => {
+    setIsFetchData(true);
     setSelectedUser(user);
     console.log("selected user: ", user);
     setIsDropDownActive(false);

@@ -17,6 +17,7 @@ function DynamicSideBar({
   setConversation,
   setCurrentChatId,
   users,
+  isFetchData,
 }) {
   const [isUserTransactionDropDown, setIsUserTransactionDropDown] = useState(
     users.map((user) => ({ name: user.tableName, isDropDown: false }))
@@ -827,7 +828,9 @@ function DynamicSideBar({
     };
 
     useEffect(() => {
-      fetchAllChats();
+      if (isFetchData) {
+        fetchAllChats();
+      }
     }, [selectedUser]);
 
     return (

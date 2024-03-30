@@ -10,19 +10,29 @@ function ChatBotPage() {
   const [activeSideBar, setActiveSideBar] = useState("chatHistory");
   const [isSideBarHidden, setIsSideBarHidden] = useState(false);
   // const users = ["Ahmad", "Bryan", "Charles", "Danish", "Emily"];
-  const [selectedUser, setSelectedUser] = useState({ tableId: 1, tableName: "Ahmad" });
+  const [selectedUser, setSelectedUser] = useState({
+    tableId: 1,
+    tableName: "Ahmad",
+  });
   const [conversation, setConversation] = useState([]);
   const [currentChatId, setCurrentChatId] = useState(1);
+  const [isFetchData, setIsFetchData] = useState(false);
 
   // retrieve users from the database (tableId, tableName)
-  const [users, setUsers] = useState([{ tableId: 1, tableName: "Ahmad" }, { tableId: 2, tableName: "Bryan" }, { tableId: 3, tableName: "Charles" }, { tableId: 4, tableName: "Danish" }, { tableId: 5, tableName: "Emily" }]);
-  
+  const [users, setUsers] = useState([
+    { tableId: 1, tableName: "Ahmad" },
+    { tableId: 2, tableName: "Bryan" },
+    { tableId: 3, tableName: "Charles" },
+    { tableId: 4, tableName: "Danish" },
+    { tableId: 5, tableName: "Emily" },
+  ]);
+
   const fetchUsers = async (e) => {
     console.log("fetching users");
     try {
-      const input = {"userId": 1}
+      const input = { userId: 1 };
       const response = await api.post("/chatbot/retrieveTables", {
-        input
+        input,
       });
       setUsers(response.data.tables);
       setSelectedUser(response.data.tables[0]);
@@ -30,13 +40,12 @@ function ChatBotPage() {
     } catch (error) {
       console.error(error);
     }
-  }
+  };
 
   useEffect(() => {
     fetchUsers();
-  }
-  , []);
-    
+  }, []);
+
   const updateSideBar = () => {
     setIsSideBarHidden(!isSideBarHidden);
   };
@@ -56,6 +65,7 @@ function ChatBotPage() {
         setConversation={setConversation}
         setCurrentChatId={setCurrentChatId}
         users={users}
+        isFetchData={isFetchData}
       />
       <button className="h-full" onClick={updateSideBar}>
         <img
@@ -72,6 +82,7 @@ function ChatBotPage() {
         setConversation={setConversation}
         currentChatId={currentChatId}
         setCurrentChatId={setCurrentChatId}
+        setIsFetchData={setIsFetchData}
       />
     </div>
   );
