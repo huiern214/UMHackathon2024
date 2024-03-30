@@ -66,6 +66,7 @@ function ChatBotPage() {
         setCurrentChatId={setCurrentChatId}
         users={users}
         isFetchData={isFetchData}
+        setIsFetchData={setIsFetchData}
       />
       <button className="h-full" onClick={updateSideBar}>
         <img
