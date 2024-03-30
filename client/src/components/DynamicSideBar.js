@@ -4,7 +4,9 @@ import ArrowDown from '../assets/ArrowDown.png'
 import OpenSideBarIcon from '../assets/OpenSideBarIcon.png'
 import {ReactComponent as XMark} from '../assets/xmark.svg'
 import Chatbot from './Chatbot'
-import {useState,useEffect} from 'react'
+import {useState,useEffect,useRef} from 'react'
+
+import PieChart from '../pages/Analysis/pieChart'
 
 function DynamicSideBar({activeSideBar,isSideBarHidden,selectedUser,setConversation,users}){
     const [isUserTransactionDropDown,setIsUserTransactionDropDown]=useState(
@@ -12,6 +14,17 @@ function DynamicSideBar({activeSideBar,isSideBarHidden,selectedUser,setConversat
             {"name":user,"isDropDown":false}
         ))
     )
+
+    const data = {
+        labels: ['Red', 'Blue', 'Yellow'],
+        datasets: [
+          {
+            label: '# of Votes',
+            data: [10, 20, 30],
+            backgroundColor: ['red', 'blue', 'yellow'],
+          },
+        ],
+      };
 
     const [isAddTransaction,setIsAddTransaction]=useState(false)
     const [isShowTransactionTable,setIsShowTransactionTable]=useState(false);
@@ -191,9 +204,74 @@ function DynamicSideBar({activeSideBar,isSideBarHidden,selectedUser,setConversat
 
 
     const AnalysisSideBar=()=>{
-        return(
-            <div style={{ display: isSideBarHidden ? 'none' : 'block'}}>
-                analysis
+        const [selectedMonth, setSelectedMonth] = useState('January'); // Initial selected month state
+        const [chartData, setChartData] = useState({
+            "Other Expenses": 242385.91,
+            "Government Services": 78652.37,
+            "Utilities": 32814.15,
+            "Debts/Overpayments": 31770.46,
+            "Insurance": 11530
+          }); // Initial dummy data for pie chart
+
+        // Define an array of months for the dropdown options
+        const months = ['January', 'February', 'March'];
+
+        // Function to handle the change in the selected month
+        const handleMonthChange = (event) => {
+            setSelectedMonth(event.target.value);
+        };
+
+        // Define the handlePrediction function
+        const handlePrediction = () => {
+            // Logic for prediction goes here
+            console.log('Predicting expenses for next month...');
+        };
+        
+        return (
+            <div  className='flex flex-col justify-center items-center'>
+                 <button
+                    onClick={handlePrediction}
+                    className='mt-4 mb-4'
+                    style={{
+                    border: '1px solid black', 
+                    padding: '4px 8px', 
+                    borderRadius: '4px', 
+                    backgroundColor: 'transparent', 
+                    cursor: 'pointer', 
+                    }}
+                >
+                    Predict Next Month Expenses
+                </button>
+
+                <div>
+                <h3 className="font-bold">Top 5 Category Expenses by Month</h3>
+                <div>
+                    <label htmlFor="monthSelect">Select Month:</label>
+                    <select id="monthSelect" value={selectedMonth} onChange={handleMonthChange}>
+                    {months.map((month) => (
+                        <option key={month} value={month}>{month}</option>
+                    ))}
+                    </select>
+                </div>
+                <div>
+                    <PieChart id="pie1" data={chartData}/>
+                </div>
+                </div>
+
+                <div className='mt-5'>
+                <h3 className="font-bold">Top 5 Category Expenses by Month</h3>
+                <div>
+                    <label htmlFor="monthSelect">Select Month:</label>
+                    <select id="monthSelect" value={selectedMonth} onChange={handleMonthChange}>
+                    {months.map((month) => (
+                        <option key={month} value={month}>{month}</option>
+                    ))}
+                    </select>
+                </div>
+                <div>
+                    <PieChart id="pie2" data={chartData}/>
+                </div>
+                </div>            
             </div>
         )
     }
