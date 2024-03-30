@@ -124,6 +124,8 @@ def print_get_Sql_chain(userPrompt, chat_history, tableId):
     sql_query = sql_chain.invoke(
         {"question": question, "chat_history": chat_history, "tableId": tableId, "search_results": search_results})
 
+    # Now you can use the sql_query string for further processing, like executing it on your database.
+    print(f"Generated SQL Query: {sql_query}")
     # use the sql to execute on the database
     # transactionData = db._execute(sql_query)
     # do exception handling for the sql query
@@ -133,9 +135,6 @@ def print_get_Sql_chain(userPrompt, chat_history, tableId):
     except Exception as e:
         print(f"Error: {e}")
     # print(f"Transaction Data: {transactionData}")
-        
-    # Now you can use the sql_query string for further processing, like executing it on your database.
-    print(f"Generated SQL Query: {sql_query}")
     
     return transactionData
 

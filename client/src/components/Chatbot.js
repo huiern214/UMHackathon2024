@@ -87,13 +87,15 @@ function Chatbot({
       const input = {
         "userPrompt": message,
         "userId": 1,
-        // "tableId": selectedUser.tableId,
-        "tableId": 1, // hardcoded for now
+        "tableId": selectedUser.tableId,
+        // "tableId": 1, // hardcoded for now
         "chatId": currentChatId
       }
-      const response = await api.post("/chatbot/generateChatResponse", {
+      console.log("input");
+      console.log(input);
+      const response = await api.post("/chatbot/generateChatResponse", 
         input
-      });
+      );
       
       console.log(response.data);
       const botReponse = response.data.response.response;
