@@ -1,5 +1,6 @@
-// Import the choose_graph function from graphUtils.js
+// Import the choose_graph function and data generation functions from graphUtils.js and dataGeneration.js
 const { choose_graph } = require('./graphUtils');
+const { generatePieChartData, generateLineGraphData, generateBarGraphData } = require('./dataGeneration');
 
 // Test cases
 const testCases = [
@@ -21,10 +22,14 @@ const testCases = [
 // Run test cases
 testCases.forEach((testCase, index) => {
     const { userInput, expectedGraphType } = testCase;
-    const graphType = choose_graph(userInput);
+    const { graphType, data } = choose_graph(userInput);
+
     console.log(`Test case ${index + 1}: User input "${userInput}" => Selected graph type: ${graphType}`);
     console.log(`Expected graph type: ${expectedGraphType}`);
+    console.log('Generated data:');
+    console.log(data);
     console.log('----------------------------------------------');
 
     // Add assertions here to validate graphType against expectedGraphType
 });
+

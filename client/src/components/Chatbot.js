@@ -2,6 +2,12 @@ import SendIcon from '../assets/SendIcon.png'
 import ArrowDown from '../assets/ArrowDown.png'
 import {useState,useEffect,useRef} from 'react'
 
+import PieChart from '../pages/Analysis/pieChart'
+import BarGraph from '../pages/Analysis/barGraph'
+import LineGraph from '../pages/Analysis/lineGraph'
+import SimplePieChart from '../pages/Analysis/simplePieChart'
+import { choose_graph } from '../pages/Analysis/graphUtils' //determine the graph type and generate the data
+
 function Chatbot({isSideBarHidden,selectedUser,setSelectedUser,users,conversation,setConversation}){
     let positionToLeft=isSideBarHidden?'360px':'80px'
 
@@ -58,16 +64,45 @@ function Chatbot({isSideBarHidden,selectedUser,setSelectedUser,users,conversatio
             sender:'user',
             timeStamp:currentTime
         }
-        const chatbotResponse={
-            text:'Chatbot response',
-            sender:'chatbot',
-            timeStamp:currentTime
-        }
+        
+        const chatbotResponse = generateChatbotResponse(message); //Call generateChatbotResponse function
+
         const newConversation=[...conversation,newMessage,chatbotResponse];
         setConversation(newConversation);
 
         setMessage("")
     }
+
+    //generateChatbotResponse function
+    const generateChatbotResponse = (userInput) => {
+        const keywords = ['Show me', 'Plot', 'Display', 'Visualize', 'chart', 'graph', 'Illustrate']; // Keywords related to graph plotting
+        const containsKeyword = keywords.some(keyword => userInput.includes(keyword));
+    
+        if (containsKeyword) {
+          const { graphType, data } = choose_graph(userInput);
+          
+          // Log the data to check if it exists
+          console.log('Graph Data:', data);
+
+          // Log the labels and data for the pie chart
+          console.log('Pie Chart Labels:', data.labels);
+          console.log('Pie Chart Data:', data.data);
+
+          return {
+            text: `Generating ${graphType} graph...`,
+            sender: 'chatbot',
+            timeStamp: new Date().toLocaleTimeString(),
+            graphType,
+            data,
+          };
+        } else {
+          return {
+            text: 'Your message does not contain keywords related to graph plotting.',
+            sender: 'chatbot',
+            timeStamp: new Date().toLocaleTimeString(),
+          };
+        }
+      };
 
     useEffect(() => {
         // Scroll to the bottom of the message container when conversation updates
@@ -79,6 +114,12 @@ function Chatbot({isSideBarHidden,selectedUser,setSelectedUser,users,conversatio
     useEffect(() => {
         setConversation([])
     }, [selectedUser]);
+
+    // Function to add indices to labels
+    const addIndices = (labels) => {
+        return labels.map((label, index) => `${index + 1}. ${label}`);
+    };
+
 
     return(
         <div className="h-full grow relative">
@@ -119,6 +160,22 @@ function Chatbot({isSideBarHidden,selectedUser,setSelectedUser,users,conversatio
                                 <div className='ml-2'>Chatbot</div>
                             </div>
                             <div className='mt-3 ml-3 text-left'>{msg.text}</div>
+
+                            {/* Render the graph based on chatbot's response */}
+                            {msg.graphType && (
+                            <div className='flex justify-center items-center mt-3'>
+                                {/* Render graph based on graphType */}
+                                {/* You can add logic here to render different types of graphs */}
+                                {/* Render PieChart */}
+                                {msg.graphType === 'pie' && (
+                                <div>
+                                    <SimplePieChart labels={msg.data.labels} data={msg.data.data} />
+                                </div>
+                                )}
+                                {msg.graphType === 'bar' && <div><BarGraph labels={msg.data.labels} data={msg.data.data}/></div>}
+                                {msg.graphType === 'line' && <div><LineGraph data={msg.data}/></div>}
+                            </div>
+                            )}
                         </div>
                     ))}
                 </div>

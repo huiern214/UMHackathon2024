@@ -193,21 +193,27 @@ function DynamicSideBar({activeSideBar,isSideBarHidden,selectedUser,setConversat
 
 
     const AnalysisSideBar=()=>{
-        const [selectedMonth, setSelectedMonth] = useState('January'); // Initial selected month state
+        const [selectedMonth1, setSelectedMonth1] = useState('January'); // Initial selected month state for pie1
+        const [selectedMonth2, setSelectedMonth2] = useState('January'); // Initial selected month state for pie2
         const [chartData, setChartData] = useState({
             "Other Expenses": 242385.91,
             "Government Services": 78652.37,
             "Utilities": 32814.15,
             "Debts/Overpayments": 31770.46,
             "Insurance": 11530
-          }); // Initial dummy data for pie chart
+        }); // Initial dummy data for pie chart
 
         // Define an array of months for the dropdown options
         const months = ['January', 'February', 'March'];
 
-        // Function to handle the change in the selected month
-        const handleMonthChange = (event) => {
-            setSelectedMonth(event.target.value);
+        // Function to handle the change in the selected month for pie1
+        const handleMonthChange1 = (event) => {
+            setSelectedMonth1(event.target.value);
+        };
+
+        // Function to handle the change in the selected month for pie2
+        const handleMonthChange2 = (event) => {
+            setSelectedMonth2(event.target.value);
         };
 
         // Define the handlePrediction function
@@ -215,55 +221,55 @@ function DynamicSideBar({activeSideBar,isSideBarHidden,selectedUser,setConversat
             // Logic for prediction goes here
             console.log('Predicting expenses for next month...');
         };
-        
+
         return (
-            <div  className='flex flex-col justify-center items-center'>
-                 <button
-                    onClick={handlePrediction}
-                    className='mt-4 mb-4'
-                    style={{
-                    border: '1px solid black', 
-                    padding: '4px 8px', 
-                    borderRadius: '4px', 
-                    backgroundColor: 'transparent', 
-                    cursor: 'pointer', 
-                    }}
-                >
-                    Predict Next Month Expenses
-                </button>
+            <div className='flex flex-col justify-center items-center'>
+            <button
+                onClick={handlePrediction}
+                className='mt-4 mb-4'
+                style={{
+                border: '1px solid black',
+                padding: '4px 8px',
+                borderRadius: '4px',
+                backgroundColor: 'transparent',
+                cursor: 'pointer',
+                }}
+            >
+                Predict Next Month Expenses
+            </button>
 
-                <div>
+            <div>
                 <h3 className="font-bold">Top 5 Category Expenses by Month</h3>
                 <div>
-                    <label htmlFor="monthSelect">Select Month:</label>
-                    <select id="monthSelect" value={selectedMonth} onChange={handleMonthChange}>
+                <label htmlFor="monthSelect1">Select Month:</label>
+                <select id="monthSelect1" value={selectedMonth1} onChange={handleMonthChange1}>
                     {months.map((month) => (
-                        <option key={month} value={month}>{month}</option>
+                    <option key={month} value={month}>{month}</option>
                     ))}
-                    </select>
+                </select>
                 </div>
                 <div>
-                    <PieChart id="pie1" data={chartData}/>
+                <PieChart id="pie1" data={chartData} />
                 </div>
-                </div>
-
-                <div className='mt-5'>
-                <h3 className="font-bold">Top 5 Category Expenses by Month</h3>
-                <div>
-                    <label htmlFor="monthSelect">Select Month:</label>
-                    <select id="monthSelect" value={selectedMonth} onChange={handleMonthChange}>
-                    {months.map((month) => (
-                        <option key={month} value={month}>{month}</option>
-                    ))}
-                    </select>
-                </div>
-                <div>
-                    <PieChart id="pie2" data={chartData}/>
-                </div>
-                </div>            
             </div>
-        )
-    }
+
+            <div className='mt-5'>
+                <h3 className="font-bold">Top 5 Category Expenses by Month</h3>
+                <div>
+                <label htmlFor="monthSelect2">Select Month:</label>
+                <select id="monthSelect2" value={selectedMonth2} onChange={handleMonthChange2}>
+                    {months.map((month) => (
+                    <option key={month} value={month}>{month}</option>
+                    ))}
+                </select>
+                </div>
+                <div>
+                <PieChart id="pie2" data={chartData} />
+                </div>
+            </div>
+            </div>
+        );
+        }
 
     const ChatHistorySideBar=()=>{
         const OpenNewChat=()=>{

@@ -2,6 +2,8 @@ import React, { useEffect, useState, useRef } from 'react';
 import Chart from 'chart.js/auto';
 
 const PieChart = ({id, data}) => {
+  console.log('PieChart Props:', id, data);
+
   const [chartInstance,setChartInstance]=useState(null);
 
   useEffect(()=>{  
@@ -36,6 +38,15 @@ const PieChart = ({id, data}) => {
         ],
       },
       options:{
+        animation: {
+          animateRotate: false, // Disable rotation animation
+          animateScale: false, // Disable scale animation
+        },
+        plugins: {
+          legend: {
+            display: false, // Hide legend
+          },
+        },
       },
     });
     setChartInstance(newChartInstance);

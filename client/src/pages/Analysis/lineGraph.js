@@ -1,13 +1,20 @@
 import React from 'react';
 import { Line } from 'react-chartjs-2';
 
-const LinePlot = ({ data }) => {
+const LineGraph = ({ data }) => {
   return (
     <div>
-      <h2>Line Graph Example</h2>
       <Line
         data={data}
         options={{
+          plugins: {
+            title: {
+              display: false,
+            },
+            legend: {
+              display: false
+            }
+          },
           scales: {
             yAxes: [
               {
@@ -23,4 +30,4 @@ const LinePlot = ({ data }) => {
   );
 };
 
-export default LinePlot;
+export default LineGraph;
