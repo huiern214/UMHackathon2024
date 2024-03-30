@@ -13,6 +13,7 @@ function ChatBotPage() {
   const [selectedUser, setSelectedUser] = useState({ tableId: 1, tableName: "Ahmad" });
   const [conversation, setConversation] = useState([]);
   const [currentChatId, setCurrentChatId] = useState(1);
+  const [isFetchData, setIsFetchData] = useState(false);
 
   // retrieve users from the database (tableId, tableName)
   const [users, setUsers] = useState([{ tableId: 1, tableName: "Ahmad" }, { tableId: 2, tableName: "Bryan" }, { tableId: 3, tableName: "Charles" }, { tableId: 4, tableName: "Danish" }, { tableId: 5, tableName: "Emily" }]);
@@ -56,6 +57,8 @@ function ChatBotPage() {
         setConversation={setConversation}
         setCurrentChatId={setCurrentChatId}
         users={users}
+        isFetchData={isFetchData}
+        setIsFetchData={setIsFetchData}
       />
       <button className="h-full" onClick={updateSideBar}>
         <img
@@ -72,6 +75,7 @@ function ChatBotPage() {
         setConversation={setConversation}
         currentChatId={currentChatId}
         setCurrentChatId={setCurrentChatId}
+        setIsFetchData={setIsFetchData}
       />
     </div>
   );

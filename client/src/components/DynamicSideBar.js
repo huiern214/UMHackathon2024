@@ -17,6 +17,8 @@ function DynamicSideBar({
   setConversation,
   setCurrentChatId,
   users,
+  isFetchData,
+  setIsFetchData,
 }) {
   const [isUserTransactionDropDown, setIsUserTransactionDropDown] = useState(
     users.map((user) => ({ name: user.tableName, isDropDown: false }))
@@ -821,13 +823,16 @@ function DynamicSideBar({
         // console.log('responseData',response.data);
         setAllChat(response.data.chats);
         console.log(response.data.chats);
+        setIsFetchData(false);
       } catch (error) {
         console.error(error);
       }
     };
 
     useEffect(() => {
-      fetchAllChats();
+      if (isFetchData) {
+        fetchAllChats();
+      }
     }, [selectedUser]);
 
     return (

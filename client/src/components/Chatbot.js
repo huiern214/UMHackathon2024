@@ -26,6 +26,7 @@ function Chatbot({
   setConversation,
   currentChatId,
   setCurrentChatId,
+  setIsFetchData,
 }) {
   let positionToLeft = isSideBarHidden ? "360px" : "80px";
 
@@ -36,6 +37,7 @@ function Chatbot({
   const [message, setMessage] = useState("");
   const messageContainerRef = useRef(null);
   const [isDropDownActive, setIsDropDownActive] = useState(false);
+  
 
   const handleChange = (e) => {
     setMessage(e.target.value);
@@ -46,6 +48,7 @@ function Chatbot({
   };
 
   const handleSelectedUser = (user) => {
+    setIsFetchData(true);
     setSelectedUser(user);
     console.log("selected user: ", user);
     // save local file for isFetchData
