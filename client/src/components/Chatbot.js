@@ -26,6 +26,7 @@ function Chatbot({
   setConversation,
   currentChatId,
   setCurrentChatId,
+  setIsFetchData,
 }) {
   let positionToLeft = isSideBarHidden ? "360px" : "80px";
 
@@ -36,6 +37,7 @@ function Chatbot({
   const [message, setMessage] = useState("");
   const messageContainerRef = useRef(null);
   const [isDropDownActive, setIsDropDownActive] = useState(false);
+  
 
   const handleChange = (e) => {
     setMessage(e.target.value);
@@ -46,8 +48,11 @@ function Chatbot({
   };
 
   const handleSelectedUser = (user) => {
+    setIsFetchData(true);
     setSelectedUser(user);
     console.log("selected user: ", user);
+    // save local file for isFetchData
+    localStorage.setItem("isFetchData", true);
     setIsDropDownActive(false);
   };
 
@@ -122,6 +127,7 @@ function Chatbot({
               timestamp: currentTime,
               transactionData: transactionData,
             };
+            console.log(chatbotResponse);
 
             const newConversation = [...conversation, newMessage, chatbotResponse];
             setConversation(newConversation);
@@ -252,7 +258,11 @@ function Chatbot({
     return labels.map((label, index) => `${index + 1}. ${label}`);
   };
 
-  const handleExport = ({ excel }) => {
+  // const [tempData, setTempData] = useState([]);
+
+  // const handleExport = ({ excel }) => {
+  const handleExport = (excel)=>{
+    console.log("excel",excel)
     const filename = "download.xlsx";
     const workbook = XLSX.utils.book_new();
     const worksheet = XLSX.utils.json_to_sheet(excel);
@@ -320,13 +330,18 @@ function Chatbot({
                     <img src={circleLogo} className="rounded-full" />
                   </div>
                   <div className="mx-2 mr-8">Quirx</div>
-                  <btn
-                    className="flex p-1 border border-black rounded-xl justify-center items-center hover:bg-gray-200 animate-bounce"
-                    onClick={() => handleExport({ excel })}
-                  >
-                    <RiFileExcel2Line className="h-8 w-8 pr-2" />
-                    Export
-                  </btn>
+                    {msg.transactionData && (
+                      <div>
+                      <btn
+                        className="flex p-1 border border-black rounded-xl justify-center items-center hover:bg-gray-200 animate-bounce"
+                        // onClick={() => handleExport( {msg.transactionData} )}
+                        onClick={() => handleExport(msg.transactionData)}
+                      >
+                        <RiFileExcel2Line className="h-8 w-8 pr-2" />
+                        Export
+                      </btn>
+                      </div>
+                    )}
                 </div>
                 <div className="mt-3 ml-3 text-left animate-typing">
                     {msg.content.split("\n").map((i, key) => {
