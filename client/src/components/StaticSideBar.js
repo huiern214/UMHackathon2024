@@ -25,7 +25,7 @@ function StaticSideBar({
         onClick={() => handleActiveSideBar("updateTransaction")}
       >
         <UploadIconSVG
-          className={`w-7 h-7 my-2 `}
+          className="w-7 h-7 my-2"
           src={UploadIcon}
           alt="upload transactions icon"
         />

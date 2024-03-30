@@ -1,37 +1,38 @@
-import * as React from 'react';
-import { useState } from 'react';
-import api from '../api/axiosConfig';
-import Logo from '../assets/Logo.png';
-import { FaUserLock } from 'react-icons/fa';
-import PersonalHelper from '../assets/PersonalHelper.png'
-import { useDispatch } from 'react-redux';
-import { toast } from 'react-toastify';
-import { loginFailure, loginSuccess } from '../redux/user/userActions';
-import { useNavigate } from 'react-router-dom';
+import * as React from "react";
+import { useState } from "react";
+import api from "../api/axiosConfig";
+import Logo from "../assets/Logo.png";
+import roundLogo from "../assets/circleLogo.png";
+import { FaUserLock } from "react-icons/fa";
+import PersonalHelper from "../assets/PersonalHelper.png";
+import { useDispatch } from "react-redux";
+import { toast } from "react-toastify";
+import { loginFailure, loginSuccess } from "../redux/user/userActions";
+import { useNavigate } from "react-router-dom";
 
 export default function Login() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     const data = new FormData(e.currentTarget);
     console.log({
-      email: data.get('email'),
-      password: data.get('password'),
+      email: data.get("email"),
+      password: data.get("password"),
     });
 
     // temporary login
     navigate(`/chatbot`, { replace: true });
-    
+
     // try {
     //   const response = await api.post('/user/login', {
     //     email: data.get('email'),
     //     password: data.get('password'),
     //   });
-      
+
     //   if (response.status === 200) {
     //     const userPermission = response.data; // Assuming the response contains the user ID
     //     dispatch(loginSuccess(userPermission.userId, userPermission.permission)); // Dispatch the login action with the user ID
@@ -54,19 +55,28 @@ export default function Login() {
           <h1 className="text-6xl text-blue-500">Stockify</h1>
         </div>
       </div> */}
-      <div className='flex flex-col w-[60%]'>
-        <img className='w-full h-[70%]' src={PersonalHelper} alt="personal helper"/>
-        <div className='text-7xl font-semibold text-lightGreen'>Your Finance Helper</div>
-        <div className='text-xl ml-3 mt-1 text-darkblue'>provides personalized questions and answers about personal finance</div>
+      <div className="flex flex-col w-[60%]">
+        <img
+          className="w-full h-[70%]"
+          src={PersonalHelper}
+          alt="personal helper"
+        />
+        <div className="m-5 text-7xl font-semibold text-gray-700 text-center">
+          Your Finance Guide
+        </div>
+        <div className="text-lg text-black text-center">
+          Query your way to financial perks
+        </div>
       </div>
-      <div className='w-[40%] bg-grayWhite'>
+      <div className="w-[40%] bg-grayWhite">
         <div className="flex items-center justify-center md:h-full">
           <div className="max-w-md w-full space-y-8">
             <div className="flex flex-col items-center">
               <div className="w-20 h-20 flex items-center justify-center rounded-full bg-primary-main">
-                  <div className="flex items-center justify-center h-12 w-12 bg-primary rounded-full">
-                      <FaUserLock className="h-6 w-6 text-white" />
-                  </div>
+                <img
+                  src={roundLogo}
+                  className="flex items-center justify-center h-12 w-12 rounded-full"
+                />
               </div>
               <h1 className="text-2xl font-bold mt-4">Login</h1>
             </div>
@@ -93,18 +103,36 @@ export default function Login() {
               />
               <div className="flex items-center justify-between">
                 <div>
-                  <input type="checkbox" id="remember" className="rounded text-blue-500 focus:ring-blue-500" />
-                  <label htmlFor="remember" className="ml-2">Remember me</label>
+                  <input
+                    type="checkbox"
+                    id="remember"
+                    className="rounded text-blue-500 focus:ring-blue-500"
+                  />
+                  <label htmlFor="remember" className="ml-2">
+                    Remember me
+                  </label>
                 </div>
-                <a href="#" className="text-primary">Forgot password?</a>
+                <a href="#" className="text-primary">
+                  Forgot password?
+                </a>
               </div>
-              <button type="submit" className="w-full py-2 bg-primary text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <button
+                type="submit"
+                className="w-full py-2 bg-primary text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
                 Login
               </button>
             </form>
             <div className="text-center">
-              <p className="text-gray-500">Don't have an account? <a href="register" className="text-primary">Register</a></p>
-              <p className="text-gray-500">&copy; Stockify {new Date().getFullYear()}</p>
+              <p className="text-gray-500">
+                Don't have an account?{" "}
+                <a href="register" className="text-primary">
+                  Register
+                </a>
+              </p>
+              <p className="text-gray-500">
+                &copy; Quirx {new Date().getFullYear()}
+              </p>
             </div>
           </div>
         </div>
