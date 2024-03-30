@@ -6,6 +6,7 @@ import { ReactComponent as XMark } from "../assets/xmark.svg";
 import Chatbot from "./Chatbot";
 import { useState, useEffect } from "react";
 import { FaPlus, FaArrowDown, FaArrowUp } from "react-icons/fa";
+import PieChart from "./pieChart";
 
 function DynamicSideBar({
   activeSideBar,
@@ -630,9 +631,79 @@ function DynamicSideBar({
   };
 
   const AnalysisSideBar = () => {
+    const [selectedMonth, setSelectedMonth] = useState("January"); // Initial selected month state
+
+    // Define an array of months for the dropdown options
+    const months = ["January", "February", "March"];
+
+    // Function to handle the change in the selected month
+    const handleMonthChange = (event) => {
+      setSelectedMonth(event.target.value);
+    };
+
+    // Define the handlePrediction function
+    const handlePrediction = () => {
+      // Logic for prediction goes here
+      console.log("Predicting expenses for next month...");
+    };
+
     return (
-      <div style={{ display: isSideBarHidden ? "none" : "block" }}>
-        analysis
+      <div className="flex flex-col justify-center items-center">
+        <button
+          onClick={handlePrediction}
+          className="mt-4 mb-4"
+          style={{
+            border: "1px solid black",
+            padding: "4px 8px",
+            borderRadius: "4px",
+            backgroundColor: "transparent",
+            cursor: "pointer",
+          }}
+        >
+          Predict Next Month Expenses
+        </button>
+
+        <div>
+          <h3 className="font-bold">Top 5 Category Expenses by Month</h3>
+          <div>
+            <label htmlFor="monthSelect">Select Month:</label>
+            <select
+              id="monthSelect"
+              value={selectedMonth}
+              onChange={handleMonthChange}
+            >
+              {months.map((month) => (
+                <option key={month} value={month}>
+                  {month}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <PieChart id="pie1" />
+          </div>
+        </div>
+
+        <div className="mt-5">
+          <h3 className="font-bold">Top 5 Category Expenses by Month</h3>
+          <div>
+            <label htmlFor="monthSelect">Select Month:</label>
+            <select
+              id="monthSelect"
+              value={selectedMonth}
+              onChange={handleMonthChange}
+            >
+              {months.map((month) => (
+                <option key={month} value={month}>
+                  {month}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <PieChart id="pie2" />
+          </div>
+        </div>
       </div>
     );
   };
