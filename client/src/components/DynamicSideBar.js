@@ -15,17 +15,6 @@ function DynamicSideBar({activeSideBar,isSideBarHidden,selectedUser,setConversat
         ))
     )
 
-    const data = {
-        labels: ['Red', 'Blue', 'Yellow'],
-        datasets: [
-          {
-            label: '# of Votes',
-            data: [10, 20, 30],
-            backgroundColor: ['red', 'blue', 'yellow'],
-          },
-        ],
-      };
-
     const [isAddTransaction,setIsAddTransaction]=useState(false)
     const [isShowTransactionTable,setIsShowTransactionTable]=useState(false);
     const [transactionTableUser,setTransactionTableUser]=useState(selectedUser);
