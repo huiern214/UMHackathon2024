@@ -1,12 +1,13 @@
 # import matplotlib.pyplot as plt
 from .create_client import create_supabase_client
+from langchain_community.utilities.sql_database import SQLDatabase
 
 
 def calculate_expenses_for_month(transaction_table_id, month):
 
     year = 2024
 
-    supabase = create_supabase_client()
+    # supabase = create_supabase_client()
     start_date = f'{year}-{month:02d}-01'
     end_date = f'{year}-{month:02d}-31'  # Assuming 31 days for simplicity
 
@@ -18,32 +19,59 @@ def calculate_expenses_for_month(transaction_table_id, month):
         AND date >= '{start_date}' AND date <= '{end_date}'     
     GROUP BY "category"
     """
-    data, count = supabase.table('Transactions').select(query).execute()
+    # data, count = supabase.table('Transactions').select(query).execute()
 
-    if data[0] == 'data':
-        data = data[1]
+    # return data
+
+    db_uri = f"sqlite:///chatbot/service/data/database.sqlite3"
+    db = SQLDatabase.from_uri(db_uri)
+    data = db._execute(query)
+    print(data)
+    
+    # [
+    #     {
+    #         "category": "Debts/Overpayments",
+    #         "total_expense": 5250.88
+    #     },
+    #     {
+    #         "category": "Dining",
+    #         "total_expense": 545.0
+    #     },
+    
+    # convert data to dict
+    data = {row['category']: row['total_expense'] for row in data}
+    # sort and get top 5
+    top_categories = sorted(data, key=data.get, reverse=True)[:5]
+    top_expenses = [data[category] for category in top_categories]
+    
+    return dict(zip(top_categories, top_expenses))
+    
+    
+    # if data[0] == 'data':
+        # data = data[1]
+        # return data
         # print(data)
-        categories = []
-        total_expenses = {}
+        # categories = []
+        # total_expenses = {}
 
-        for row in data:
-            category = row['category']
-            total_expense = row['withdrawalAmt']
+        # for row in data:
+        #     category = row['category']
+        #     total_expense = row['withdrawalAmt']
 
-            if category in total_expenses and category != 'Income/Salary':
-                total_expenses[category] += total_expense
-            else:
-                total_expenses[category] = total_expense
+        #     if category in total_expenses and category != 'Income/Salary':
+        #         total_expenses[category] += total_expense
+        #     else:
+        #         total_expenses[category] = total_expense
 
-        sorted_expenses = dict(
-            sorted(total_expenses.items(), key=lambda item: item[1], reverse=True))
-        top_categories = list(sorted_expenses.keys())[:5]
-        top_expenses = [sorted_expenses[category]
-                        for category in top_categories]
+        # sorted_expenses = dict(
+        #     sorted(total_expenses.items(), key=lambda item: item[1], reverse=True))
+        # top_categories = list(sorted_expenses.keys())[:5]
+        # top_expenses = [sorted_expenses[category]
+        #                 for category in top_categories]
 
-        # Custom autopct function to display only the percentage
-        def autopct_format(pct):
-            return f'{pct:.1f}%'
+        # # Custom autopct function to display only the percentage
+        # def autopct_format(pct):
+        #     return f'{pct:.1f}%'
 
         # plt.figure(figsize=(8, 8))
         # pie = plt.pie(top_expenses, labels=top_categories,
@@ -58,10 +86,10 @@ def calculate_expenses_for_month(transaction_table_id, month):
         # plt.show()
 
         # return top 5 categories and their expenses in dict
-        return dict(zip(top_categories, top_expenses))
+        # return dict(zip(top_categories, top_expenses))
 
-    else:
-        print("Failed to calculate expenses.")
+    # else:
+        # print("Failed to calculate expenses.")
 
 
 # calculate_expenses_for_month(1, 1)

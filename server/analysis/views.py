@@ -8,6 +8,24 @@ from .service.paymentMethodExpenses import calculate_sum_by_payment_method
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from .service.trendAnalysis import predict_trend, get_all_expenses, get_all_income
+from .service.total_expense_income import calculate_total_expenses_earnings
+
+# calculate_total_expenses_earnings(transaction_table_id, month)
+@csrf_exempt
+def calculateTotalExpensesEarnings(request):
+    if request.method == 'POST':
+        data = json.loads(request.body.decode('utf-8'))
+        tableId = data.get('tableId', '')
+        month = data.get('month', '')
+
+        # Call your chatbot function and get the response
+        # response = generate_chat_response(user_prompt)
+        result = calculate_total_expenses_earnings(tableId, month)
+
+        # Return the response as JSON
+        return JsonResponse({'response': result})
+
+    return JsonResponse({'error': 'Invalid request method'})
 
 @csrf_exempt
 def predict_expenses_trend(request):
