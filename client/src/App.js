@@ -4,6 +4,7 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import ChatBotPage from './pages/ChatbotPage';
 import WithNavbar from './components/WithNavbar';
 import NotFound404 from './pages/NotFound404';
 import Footer from './components/Footer';
@@ -14,13 +15,14 @@ function App() {
       <BrowserRouter>
         <ToastContainer />
         <Routes >
-          <Route path="/login" element={<Login />} />
+          <Route path="/" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/chatbot" element={<ChatBotPage />} />
           {/* <Route element={<WithNavbar />}> */}
-            <Route path="*" element={<NotFound404 />} />
+          <Route path="*" element={<NotFound404 />} />
           {/* </Route> */}
         </Routes>
-        <Footer />
+        {/* <Footer /> */}
       </BrowserRouter>
     </div>
   );
