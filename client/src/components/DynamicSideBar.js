@@ -509,8 +509,8 @@ function DynamicSideBar({
   };
 
   const AnalysisSideBar=()=>{
-    const [selectedMonth1, setSelectedMonth1] = useState('January'); // Initial selected month state for pie1
-    const [selectedMonth2, setSelectedMonth2] = useState('January'); // Initial selected month state for pie2
+    const [selectedMonth1, setSelectedMonth1] = useState(1); // Initial selected month state for pie1
+    const [selectedMonth2, setSelectedMonth2] = useState(1); // Initial selected month state for pie2
     const [chartData, setChartData] = useState({
         "Other Expenses": 242385.91,
         "Government Services": 78652.37,
@@ -523,13 +523,38 @@ function DynamicSideBar({
     const months = ['January', 'February', 'March'];
 
     // Function to handle the change in the selected month for pie1
-    const handleMonthChange1 = (event) => {
-        setSelectedMonth1(event.target.value);
+    const handleMonthChange1 = async (event) => {
+      setSelectedMonth1(parseInt(event.target.value));
+      console.log("selectMonth1",selectedMonth1)
+      
+      try {
+        const input = { "tableId": selectedUser.tableID, "month": selectedMonth1 }
+        console.log("heyy",input);
+        const response = await api.post("/analysis/categoryExpensesByMonth", 
+          input
+        );
+        console.log(response.data);
+        setChartData(response.data);
+      } catch (error) {
+        console.error(error);
+      }
     };
 
     // Function to handle the change in the selected month for pie2
-    const handleMonthChange2 = (event) => {
-        setSelectedMonth2(event.target.value);
+    const handleMonthChange2 = async (event) => {
+      setSelectedMonth2(parseInt(event.target.value));
+      
+      try {
+        const input = { "tableId": selectedUser.tableID, "month": selectedMonth2 }
+        console.log("heyy",input);
+        const response = await api.post("/analysis/paymentMethodExpensesByMonth", 
+          input
+        );
+        console.log(response.data);
+        setChartData(response.data);
+      } catch (error) {
+        console.error(error);
+      }
     };
 
     // Define the handlePrediction function
@@ -537,6 +562,9 @@ function DynamicSideBar({
         // Logic for prediction goes here
         console.log('Predicting expenses for next month...');
     };
+
+    useEffect(() => {
+    }, [selectedMonth1, selectedMonth2]);
 
     return (
         <div className='flex flex-col justify-center items-center'>
@@ -559,9 +587,12 @@ function DynamicSideBar({
             <div>
             <label htmlFor="monthSelect1">Select Month:</label>
             <select id="monthSelect1" value={selectedMonth1} onChange={handleMonthChange1}>
-                {months.map((month) => (
+                {/* {months.map((month) => (
                 <option key={month} value={month}>{month}</option>
-                ))}
+                ))} */}
+              {months.map((month, index) => (
+                <option key={index+1} value={index+1}>{month}</option>
+              ))}
             </select>
             </div>
             <div>
@@ -574,9 +605,12 @@ function DynamicSideBar({
             <div>
             <label htmlFor="monthSelect2">Select Month:</label>
             <select id="monthSelect2" value={selectedMonth2} onChange={handleMonthChange2}>
-                {months.map((month) => (
+                {/* {months.map((month) => (
                 <option key={month} value={month}>{month}</option>
-                ))}
+                ))} */}
+              {months.map((month, index) => (
+                <option key={index+1} value={index+1}>{month}</option>
+              ))}
             </select>
             </div>
             <div>
