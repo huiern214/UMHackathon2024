@@ -1,7 +1,9 @@
 import matplotlib.pyplot as plt
 from create_client import create_supabase_client
 
-def calculate_sum_by_payment_method(transaction_table_id, year, month):
+def calculate_sum_by_payment_method(transaction_table_id, month):
+
+    year =2024
     supabase = create_supabase_client()
     start_date = f'{year}-{month:02d}-01'
     end_date = f'{year}-{month:02d}-31'  # Assuming 31 days for simplicity
@@ -10,7 +12,7 @@ def calculate_sum_by_payment_method(transaction_table_id, year, month):
     SELECT "paymentMethod", SUM("withdrawalAmt") AS total_expense
     FROM "Transactions"
     WHERE "transactionTableID" = {transaction_table_id}
-        AND ("withdrawalAmt" > 0 AND "category" != 'Income/Salary')
+        AND "withdrawalAmt" > 0
         AND date >= '{start_date}' AND date <= '{end_date}'     
     GROUP BY "paymentMethod"
     """
@@ -59,4 +61,4 @@ def calculate_sum_by_payment_method(transaction_table_id, year, month):
         print("Failed to calculate expenses.")
         print("Error:", response)
 
-calculate_sum_by_payment_method(1, 2024, 1)
+calculate_sum_by_payment_method(1, 1)

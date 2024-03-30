@@ -1,7 +1,10 @@
 import matplotlib.pyplot as plt
 from create_client import create_supabase_client
 
-def calculate_expenses_for_month(transaction_table_id, year, month):
+def calculate_expenses_for_month(transaction_table_id, month):
+
+    year = 2024
+
     supabase = create_supabase_client()
     start_date = f'{year}-{month:02d}-01'
     end_date = f'{year}-{month:02d}-31'  # Assuming 31 days for simplicity
@@ -10,7 +13,7 @@ def calculate_expenses_for_month(transaction_table_id, year, month):
     SELECT "category", SUM("withdrawalAmt") AS total_expense
     FROM "Transactions"
     WHERE "transactionTableID" = {transaction_table_id}
-        AND ("withdrawalAmt" > 0 AND "category" != 'Income/Salary')
+        AND "withdrawalAmt" > 0 
         AND date >= '{start_date}' AND date <= '{end_date}'     
     GROUP BY "category"
     """
@@ -18,7 +21,7 @@ def calculate_expenses_for_month(transaction_table_id, year, month):
 
     if 'data' in response:
         data = response['data']        
-
+        print(data)
         categories = []
         total_expenses = {}
 
@@ -54,4 +57,4 @@ def calculate_expenses_for_month(transaction_table_id, year, month):
         print("Failed to calculate expenses.")
         print("Error:", response)
 
-calculate_expenses_for_month(1, 2024, 1)
+calculate_expenses_for_month(1, 1)
