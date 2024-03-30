@@ -1,7 +1,7 @@
 import re
 from datetime import datetime
 from langchain_community.utilities.sql_database import SQLDatabase
-from langchain_core.messages import AIMessage, HumanMessage
+from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.runnables import RunnablePassthrough
@@ -9,14 +9,27 @@ from langchain_core.output_parsers import StrOutputParser
 from langchain_openai import ChatOpenAI
 import firebase_admin
 from firebase_admin import credentials, firestore
-from config import OPENAI_API_KEY
+from .config import OPENAI_API_KEY
 
-cred = credentials.Certificate("chatbot/firebase_key.json")
+cred = credentials.Certificate("./chatbot/service/firebase_key.json")
 firebase_admin.initialize_app(cred)
 firestore_client = firestore.client()
-db_uri = f"sqlite:///chatbot/data/database.sqlite3"
+db_uri = f"sqlite:///chatbot/service/data/database.sqlite3"
 db = SQLDatabase.from_uri(db_uri)
 API_KEY = OPENAI_API_KEY
+
+
+def create_new_chat(userId: int = 1, tableId: int = 1, chatName: str = "New Chat"):
+    """Add a new chat document to the "chats" collection and return the document ID"""
+    query_collection = firestore_client.collection("chats")
+    query_document = query_collection.add({
+        "userId": userId,
+        "tableId": tableId,
+        "chatName": chatName,
+        "history": []
+    })
+    query_id = query_document[1].id
+    return query_id
 
 
 def get_search_results(userPrompt: str, tableId: int = 1):
@@ -110,11 +123,43 @@ def print_get_Sql_chain(userPrompt, chat_history, tableId):
     sql_query = sql_chain.invoke(
         {"question": question, "chat_history": chat_history, "tableId": tableId, "search_results": search_results})
 
+    # use the sql to execute on the database
+    transactionData = db._execute(sql_query)
+    # print(f"Transaction Data: {transactionData}")
+        
     # Now you can use the sql_query string for further processing, like executing it on your database.
     print(f"Generated SQL Query: {sql_query}")
+    
+    return transactionData
 
 
-def get_response(user_query: str, chatId: str):
+def get_response(user_query: str = "", userId: int = None, tableId: str = "", chatId: str = ""):
+    # llm = ChatGoogleGenerativeAI(model="gemini-pro")
+    llm = ChatOpenAI(model_name="gpt-3.5-turbo",
+                     openai_api_key=API_KEY)
+    
+    # If chatId not found, create a new chat
+    if chatId == "" or chatId is None or not firestore_client.collection("chats").document(chatId).get().exists:
+        # llm generate chatname based on user_query
+        chatName = "New Chat"
+        new_chat_messages = [
+            SystemMessage(content="""Create a new chat session name based on user query.
+                          Example
+                            Question: What is my total coffee spending?
+                            Bot response: Coffee Spending
+                            
+                            Your turn:
+                            
+                            Question: {user_query}
+                            Bot response: 
+                            *Do not include the word 'Chat Name:' in the response. Just provide the generated chat name.
+                          """), 
+            HumanMessage(content=user_query)]
+        llm_response = llm.invoke(new_chat_messages)
+        chatName = llm_response.content
+        # print(chatName)
+        chatId = create_new_chat(userId, tableId, chatName)
+    
     queryDocumentRef = firestore_client.collection("chats").document(chatId)
     queryDocument = queryDocumentRef.get().to_dict()
     messages = queryDocument.get("history", [])
@@ -139,7 +184,7 @@ def get_response(user_query: str, chatId: str):
     template = """
     You are a data analyst that provides personalized questions and answers about personal finance. You are interacting with a user who is asking you questions about the personal transaction database.
     Based on the table schema below, question, sql query, and sql response, write a natural language response. Avoid repeating the same information in the question and response. Avoid mentioning the transactionTableID and 'Based on the query you provided' in the response.
-    If the user asks for a list of transactions, list all without limit.
+    If the user asks for a list of transactions, list all with limit 10. If user ask more than that, we will provide transaction data in csv later.
     <SCHEMA>{schema}</SCHEMA>
 
     Conversation History: {chat_history}
@@ -148,10 +193,6 @@ def get_response(user_query: str, chatId: str):
     SQL Response: {response}"""
 
     prompt = ChatPromptTemplate.from_template(template)
-    # llm = ChatGoogleGenerativeAI(model="gemini-pro")
-    # llm = ChatGroq(temperature=0, model_name="mixtral-8x7b-32768")
-    llm = ChatOpenAI(model_name="gpt-3.5-turbo",
-                     openai_api_key=API_KEY)
 
     chain = (
         RunnablePassthrough.assign(query=sql_chain).assign(
@@ -164,7 +205,7 @@ def get_response(user_query: str, chatId: str):
     )
 
     # print the generated SQL query
-    print_get_Sql_chain(user_query, chat_history, tableId)
+    transactionData = print_get_Sql_chain(user_query, chat_history, tableId)
 
     bot_response = chain.invoke({
         "chat_history": chat_history,
@@ -182,27 +223,39 @@ def get_response(user_query: str, chatId: str):
         queryDocumentRef.update({
             "history": messages
         })
-    return bot_response
+        
+    result = {
+        "response": bot_response,
+        "chatId": chatId,
+        "transactionData": transactionData
+    }
+    
+    return result
 
 
-def create_new_chat(userId: int = 1, tableId: int = 1):
-    """Add a new chat document to the "chats" collection and return the document ID"""
-    query_collection = firestore_client.collection("chats")
-    query_document = query_collection.add({
-        "userId": userId,
-        "tableId": tableId,
-        "history": []
-    })
-    query_id = query_document[1].id
-    return query_id
+def retrieve_chat_history(chatId: str):
+    queryDocumentRef = firestore_client.collection("chats").document(chatId)
+    queryDocument = queryDocumentRef.get().to_dict()
+    messages = queryDocument.get("history", [])
+    return messages
 
+
+def retrieve_chats_by_tableId(tableId: int):
+    query = firestore_client.collection("chats").where("tableId", "==", tableId)
+    queryDocument = query.stream()
+    chats = []
+    for document in queryDocument:
+        # get chat id and chat name
+        chat = document.to_dict()
+        chats.append({"chatId": document.id, "chatName": chat.get("chatName")})
+    return chats
 
 # chatId = create_new_chat(1, 3)
-chatId = "G29z15gR7MvP3FVlBni8"  # chatId for user 1 and table 1
+# chatId = "G29z15gR7MvP3FVlBni8"  # chatId for user 1 and table 1
 # chatId = "qwGFGMOFHpDDkhGgvFwO"  # chatId for user 1 and table 3
 
 # Question for table 1
-question = "What is my total coffee spending?"
+# question = "What is my total coffee spending?"
 # question = "How much is my total salary for the last 5 months?"
 # question = "Can you list all the transactions for my monthly salary?"
 # question = "What is my total income?"
@@ -210,4 +263,5 @@ question = "What is my total coffee spending?"
 
 # Question for table 3
 # question = "May I know the total rent payments I earn?"
-print(get_response(question, chatId))
+# print(get_response(question, chatId))
+# print(get_response(question, 1, 1))
