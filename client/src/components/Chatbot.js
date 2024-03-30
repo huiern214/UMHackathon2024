@@ -1,6 +1,7 @@
 import SendIcon from "../assets/SendIcon.png";
 import ArrowDown from "../assets/ArrowDown.png";
 import { useState, useEffect, useRef } from "react";
+import api from "../api/axiosConfig";
 
 function Chatbot({
   isSideBarHidden,
@@ -9,6 +10,8 @@ function Chatbot({
   users,
   conversation,
   setConversation,
+  currentChatId,
+  setCurrentChatId,
 }) {
   let positionToLeft = isSideBarHidden ? "360px" : "80px";
 
@@ -30,6 +33,7 @@ function Chatbot({
 
   const handleSelectedUser = (user) => {
     setSelectedUser(user);
+    console.log("selected user: ", user);
     setIsDropDownActive(false);
   };
 
@@ -43,7 +47,7 @@ function Chatbot({
             isDropDownActive ? "bg-white text-black" : "bg-white text-black"
           } `}
         >
-          {selectedUser}
+          {selectedUser.tableName}
           <img
             src={isDropDownActive ? ArrowDown : ArrowDown}
             alt="arrow down"
@@ -55,11 +59,11 @@ function Chatbot({
             {/* Choose User Button */}
             {users.map((user) => (
               <button
-                key={user}
+                key={user.tableId}
                 onClick={() => handleSelectedUser(user)}
                 className="block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
               >
-                {user}
+                {user.tableName}
               </button>
             ))}
           </div>
@@ -68,20 +72,76 @@ function Chatbot({
     );
   };
 
-  const handleSend = () => {
+  const handleSend = async () => {
     const currentTime = new Date().toLocaleTimeString();
     const newMessage = {
-      text: message,
-      sender: "user",
-      timeStamp: currentTime,
+      author: "user",
+      content: message,
+      timestamp: currentTime,
     };
-    const chatbotResponse = {
-      text: "Chatbot response",
-      sender: "chatbot",
-      timeStamp: currentTime,
-    };
-    const newConversation = [...conversation, newMessage, chatbotResponse];
+
+    const newConversation = [...conversation, newMessage];
     setConversation(newConversation);
+
+    try {
+      const input = {
+        "userPrompt": message,
+        "userId": 1,
+        // "tableId": selectedUser.tableId,
+        "tableId": 1, // hardcoded for now
+        "chatId": currentChatId
+      }
+      const response = await api.post("/chatbot/generateChatResponse", {
+        input
+      });
+      
+      console.log(response.data);
+      const botReponse = response.data.response.response;
+      const transactionData = response.data.response.transactionData;
+      const chatId = response.data.response.chatId;
+
+      if (currentChatId == "") {
+        setCurrentChatId(chatId);
+      }
+
+      const chatbotResponse = {
+        author: "bot",
+        content: botReponse,
+        timestamp: currentTime,
+      };
+
+      const newConversation = [...conversation, chatbotResponse];
+      setConversation(newConversation);
+      
+      console.log(response.data.tables);
+    } catch (error) {
+      console.error(error);
+    }
+
+    // Example Bot Response
+    // "response": {
+    //   "response": "The coffee transaction data you requested includes two entries. The first transaction occurred on January 6th at a Coffee Shop, paid in cash for $20. The second transaction took place on January 8th at the same Coffee Shop, paid with a debit card for $15.",
+    //   "chatId": "2tltHUTArqqOJIatgM9J",
+    //   "transactionData": [
+    //       {
+    //           "transactionTableID": 1,
+    //           "transactionID": "TRX20220328123527",
+    //           "date": "2024-01-06",
+    //           "transactionDetails": "Coffee Shop",
+    //           "description": "Expenses for coffee and snacks",
+    //           "category": "Dining",
+    //           "paymentMethod": "Cash",
+    //           "withdrawalAmt": 20.0,
+    //           "depositAmt": null
+    //       },
+
+    // const chatbotResponse = {
+    //   text: "Chatbot response",
+    //   sender: "chatbot",
+    //   timeStamp: currentTime,
+    // };
+    // const newConversation = [...conversation, newMessage, chatbotResponse];
+    // setConversation(newConversation);
 
     setMessage("");
   };
@@ -96,6 +156,7 @@ function Chatbot({
 
   useEffect(() => {
     setConversation([]);
+    setCurrentChatId("");
   }, [selectedUser]);
 
   return (
@@ -113,7 +174,7 @@ function Chatbot({
         {conversation.length === 0 ? (
           <div className="flex flex-col mt-36">
             <p className="flex justify-center font-semibold text-3xl">
-              Hello, {selectedUser}
+              Hello, {selectedUser.tableName}
             </p>
             <p className="flex justify-center font-semibold text-3xl">
               How can I help you today?
@@ -128,7 +189,7 @@ function Chatbot({
           className="grow overflow-y-auto mb-10"
         >
           {conversation.map((msg, index) =>
-            msg.sender === "user" ? (
+            msg.author === "user" ? (
               //user message
               <div className="flex flex-col w-full h-fit px-5 mt-2">
                 <div className="flex justify-end items-center">
@@ -137,7 +198,7 @@ function Chatbot({
                     {/* <img alt='user profile pic'/> */}
                   </div>
                 </div>
-                <div className="mt-3 mr-2 text-right">{msg.text}</div>
+                <div className="mt-3 mr-2 text-right">{msg.content}</div>
               </div>
             ) : (
               //chatbot response
@@ -148,7 +209,7 @@ function Chatbot({
                   </div>
                   <div className="ml-2">Chatbot</div>
                 </div>
-                <div className="mt-3 ml-3 text-left">{msg.text}</div>
+                <div className="mt-3 ml-3 text-left">{msg.content}</div>
               </div>
             )
           )}

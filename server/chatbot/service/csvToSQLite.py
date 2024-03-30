@@ -56,6 +56,9 @@ insertTransactionTableToSQLite(sqlite_file_path='chatbot/data/database.sqlite3',
 insertTransactionTableToSQLite(sqlite_file_path='chatbot/data/database.sqlite3',
                                csv_file_path='chatbot/data/Danish.csv', userId=1, transactionTableId=None)
 
+insertTransactionTableToSQLite(sqlite_file_path='chatbot/data/database.sqlite3',
+                               csv_file_path='chatbot/data/Emily.csv', userId=1, transactionTableId=None)
+
 # CURRENT SCHEMA
 # TransactionTables
 # transactionTableID, userID, transactionTableName

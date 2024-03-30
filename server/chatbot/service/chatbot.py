@@ -10,6 +10,7 @@ from langchain_openai import ChatOpenAI
 import firebase_admin
 from firebase_admin import credentials, firestore
 from .config import OPENAI_API_KEY
+from google.cloud.firestore_v1.base_query import FieldFilter
 
 cred = credentials.Certificate("./chatbot/service/firebase_key.json")
 firebase_admin.initialize_app(cred)
@@ -124,7 +125,13 @@ def print_get_Sql_chain(userPrompt, chat_history, tableId):
         {"question": question, "chat_history": chat_history, "tableId": tableId, "search_results": search_results})
 
     # use the sql to execute on the database
-    transactionData = db._execute(sql_query)
+    # transactionData = db._execute(sql_query)
+    # do exception handling for the sql query
+    transactionData = []
+    try:
+        transactionData = db._execute(sql_query)
+    except Exception as e:
+        print(f"Error: {e}")
     # print(f"Transaction Data: {transactionData}")
         
     # Now you can use the sql_query string for further processing, like executing it on your database.
@@ -241,7 +248,8 @@ def retrieve_chat_history(chatId: str):
 
 
 def retrieve_chats_by_tableId(tableId: int):
-    query = firestore_client.collection("chats").where("tableId", "==", tableId)
+    query = firestore_client.collection("chats").where(filter=FieldFilter("tableId", "==", tableId))
+    # query = firestore_client.collection("chats").where("tableId", "==", tableId)
     queryDocument = query.stream()
     chats = []
     for document in queryDocument:
@@ -249,6 +257,18 @@ def retrieve_chats_by_tableId(tableId: int):
         chat = document.to_dict()
         chats.append({"chatId": document.id, "chatName": chat.get("chatName")})
     return chats
+
+def retrieve_all_tables(userId: int = 1):
+    db = SQLDatabase.from_uri(db_uri)
+    query = f"SELECT transactionTableID AS tableID, transactionTableName AS tableName FROM TransactionTables WHERE userID = {userId};"
+    tables = []
+    try:
+        tables = db._execute(query)
+        print("Tables: ", tables)
+    except Exception as e:
+        print(f"Error: {e}")
+    return tables
+
 
 # chatId = create_new_chat(1, 3)
 # chatId = "G29z15gR7MvP3FVlBni8"  # chatId for user 1 and table 1

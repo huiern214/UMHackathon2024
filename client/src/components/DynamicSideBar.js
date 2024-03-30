@@ -7,22 +7,23 @@ import Chatbot from "./Chatbot";
 import { useState, useEffect } from "react";
 import { FaPlus, FaArrowDown, FaArrowUp } from "react-icons/fa";
 import PieChart from "./pieChart";
+import api from "../api/axiosConfig";
 
 function DynamicSideBar({
   activeSideBar,
   isSideBarHidden,
   selectedUser,
   setConversation,
+  setCurrentChatId,
   users,
 }) {
   const [isUserTransactionDropDown, setIsUserTransactionDropDown] = useState(
-    users.map((user) => ({ name: user, isDropDown: false }))
+    users.map((user) => ({ name: user.tableName, isDropDown: false }))
   );
 
   const [isAddTransaction, setIsAddTransaction] = useState(false);
   const [isShowTransactionTable, setIsShowTransactionTable] = useState(false);
-  const [transactionTableUser, setTransactionTableUser] =
-    useState(selectedUser);
+  const [transactionTableUser, setTransactionTableUser] = useState(selectedUser);
   const transactions = [
     {
       transactionID: "TRX20220328123461",
@@ -66,33 +67,33 @@ function DynamicSideBar({
     },
   ];
 
-  const [chatHistory, setChatHistory] = useState([
-    {
-      date: "today",
-      title: "1Month Spending",
-      content: {},
-    },
-    {
-      date: "today",
-      title: "1Month Spending",
-      content: {},
-    },
-    {
-      date: "yesterday",
-      title: "1Month Spending",
-      content: {},
-    },
-    {
-      date: "yesterday",
-      title: "1Month Spending",
-      content: {},
-    },
-    {
-      date: "This month",
-      title: "1Month Spending",
-      content: {},
-    },
-  ]);
+  // const [chatHistory, setChatHistory] = useState([
+  //   {
+  //     date: "today",
+  //     title: "1Month Spending",
+  //     content: {},
+  //   },
+  //   {
+  //     date: "today",
+  //     title: "1Month Spending",
+  //     content: {},
+  //   },
+  //   {
+  //     date: "yesterday",
+  //     title: "1Month Spending",
+  //     content: {},
+  //   },
+  //   {
+  //     date: "yesterday",
+  //     title: "1Month Spending",
+  //     content: {},
+  //   },
+  //   {
+  //     date: "This month",
+  //     title: "1Month Spending",
+  //     content: {},
+  //   },
+  // ]);
 
   const UserTransactionTable = ({ transactionItems, searchQuery }) => {
     const [sortedItems, setSortedItems] = useState(
@@ -708,37 +709,45 @@ function DynamicSideBar({
     );
   };
 
+
   const ChatHistorySideBar = () => {
+
+    const [allChat, setAllChat] = useState([]);
+    
     const OpenNewChat = () => {
       const newChat = {
-        date: "today",
-        title: "1Month Spending",
-        content: {},
+        chatId: "",
+        chatName: "New Chat",
       };
 
-      setChatHistory([...chatHistory, newChat]);
-
+      setAllChat([...allChat, newChat]);
       //open a new chat
       setConversation([]);
     };
 
-    let todayChat = [];
-    let ytdChat = [];
-    let thisMonthChat = [];
-    let allOtherChat = [];
 
-    for (let i = 0; i < chatHistory.length; i++) {
-      let chat = chatHistory[i];
-      if (chat.date === "today") {
-        todayChat.push(chat);
-      } else if (chat.date === "yesterday") {
-        ytdChat.push(chat);
-      } else if (chat.date === "This month") {
-        thisMonthChat.push(chat);
-      } else {
-        allOtherChat.push(chat);
+    // by tableId
+    const fetchAllChats = async (e) => {
+      console.log("fetching all chats");
+      try {
+        console.log('selectedUser',selectedUser);
+        const input = { "tableId": selectedUser.tableID }
+        // console.log(input);
+        const response = await api.post("/chatbot/retrieveChats", 
+          input
+        );
+        // console.log('responseData',response.data);
+        setAllChat(response.data.chats);
+        // console.log(response.data.chats);
+      } catch (error) {
+        console.error(error);
       }
     }
+    
+    useEffect(() => {
+      fetchAllChats();
+    }
+    ,[selectedUser]);
 
     return (
       <div
@@ -750,50 +759,14 @@ function DynamicSideBar({
           onClick={OpenNewChat}
         >
           <img src={PlusIcon} alt="open new chat" />
-          <div className="">New chat</div>
+          <div className="">New Chat</div>
         </button>
-        <div className="flex flex-col w-full mt-2 ml-3 ">
-          {todayChat.length > 0 ? (
-            <div className="flex flex-col w-full my-2">
-              <div>Today</div>
-              {todayChat.map((chat, index) => (
-                <IndividualChatHistory chatTitle={chat.title} />
-              ))}
-            </div>
-          ) : (
-            <div></div>
-          )}
-        </div>
         <div className="flex flex-col w-full mt-2 ml-3">
-          {ytdChat.length > 0 ? (
+          {allChat.length > 0 ? (
             <div className="flex flex-col w-full my-2">
-              <div>Yesterday</div>
-              {ytdChat.map((chat, index) => (
-                <IndividualChatHistory chatTitle={chat.title} />
-              ))}
-            </div>
-          ) : (
-            <div></div>
-          )}
-        </div>
-        <div className="flex flex-col w-full mt-2 ml-3">
-          {thisMonthChat.length > 0 ? (
-            <div className="flex flex-col w-full my-2">
-              <div>This month</div>
-              {thisMonthChat.map((chat, index) => (
-                <IndividualChatHistory chatTitle={chat.title} />
-              ))}
-            </div>
-          ) : (
-            <div></div>
-          )}
-        </div>
-        <div className="flex flex-col w-full mt-2 ml-3">
-          {allOtherChat.length > 0 ? (
-            <div className="flex flex-col w-full my-2">
-              <div>All chat history</div>
-              {allOtherChat.map((chat, index) => (
-                <IndividualChatHistory chatTitle={chat.title} />
+              <div>Chat Session</div>
+              {allChat.map((chat, index) => (
+                <IndividualChatHistory chatTitle={chat.chatName} chatId={chat.chatId} />
               ))}
             </div>
           ) : (
@@ -804,11 +777,29 @@ function DynamicSideBar({
     );
   };
 
-  const IndividualChatHistory = ({ chatTitle }) => {
+  const openConversation = async (chatId) => {
+    setConversation([])
+    //get conversation from chatId
+    try {
+      console.log('chatId',chatId);
+      const input = { "chatId": chatId }
+      // console.log(input);
+      const response = await api.post("/chatbot/retrieveChatHistory", 
+        input
+      );
+      console.log(response.data.response);
+      setConversation(response.data.response);
+      setCurrentChatId(chatId);
+    } catch (error) {
+      console.error(error);
+      }
+  }
+      
+  const IndividualChatHistory = ({ chatTitle, chatId }) => {
     return (
-      <button className="flex w-fit items-center pr-10 my-1 hover:bg-gray-300 hover:border rounded-lg">
+      <button className="flex w-fit items-center pr-10 my-1 hover:bg-gray-300 hover:border rounded-lg" onClick={() => openConversation(chatId)}>
         <img src={ChatIcon} alt="chat" className="h-4 w-4 mt-1" />
-        <div className="ml-2">{chatTitle}</div>
+        <div className="ml-2">{chatTitle ? chatTitle : "New Chat"}</div>
       </button>
     );
   };
