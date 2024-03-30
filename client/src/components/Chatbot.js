@@ -43,9 +43,7 @@ function Chatbot({
         <button
           id="btnChooseUser"
           onClick={handleToggle}
-          className={`flex items-center px-4 py-2  font-semibold ${
-            isDropDownActive ? "bg-white text-black" : "bg-white text-black"
-          } `}
+          className="inline-flex items-center p-2 rounded-2xl hover:bg-gray-50 border border-black text-gray-700"
         >
           {selectedUser.tableName}
           <img
@@ -85,19 +83,14 @@ function Chatbot({
 
     try {
       const input = {
-        "userPrompt": message,
-        "userId": 1,
-        "tableId": selectedUser.tableId,
+        userPrompt: message,
+        userId: 1,
+        tableId: selectedUser.tableId,
         // "tableId": 1, // hardcoded for now
-        "chatId": currentChatId
-      }
-      console.log("input");
-      console.log(input);
-      const response = await api.post("/chatbot/generateChatResponse", 
-        input
-      );
-      
-      console.log(response.data);
+        chatId: currentChatId,
+      };
+      const response = await api.post("/chatbot/generateChatResponse", input);
+
       const botReponse = response.data.response.response;
       const transactionData = response.data.response.transactionData;
       const chatId = response.data.response.chatId;
@@ -114,7 +107,7 @@ function Chatbot({
 
       const newConversation = [...conversation, chatbotResponse];
       setConversation(newConversation);
-      
+
       console.log(response.data.tables);
     } catch (error) {
       console.error(error);
@@ -165,9 +158,9 @@ function Chatbot({
     <div className="h-full grow relative">
       <div
         id="myChatbot"
-        className={`absolute flex flex-col h-full w-[800px]  overflow-hidden transition-all left-[${positionToLeft}]`}
+        className={`absolute flex flex-col h-full w-[800px] overflow-hidden transition-all left-[${positionToLeft}]`}
       >
-        <div className="flex w-[100%] justify-center items-center text-xl font-bold mb-2">
+        <div className="m-3 flex w-[100%] justify-center items-center text-3xl font-semibold mb-2">
           Quirx
         </div>
         <div className="flex justify-end">
@@ -218,12 +211,12 @@ function Chatbot({
         </div>
         <div
           id="inputSession"
-          className="flex w-full h-fit mb-5 border-gray-300"
+          className="border flex w-full mb-5 border-gray-600 rounded-xl"
         >
           <textarea
             value={message}
             onChange={handleChange}
-            className=" w-[93%] h-10 resize-none text-base border rounded-lg text-gray-900 rows-3"
+            className="w-[93%] resize-none text-base rounded-xl text-black rows-3 items-center justify-center p-2"
             placeholder="What is your inquiry?"
             onKeyDown={(e) => {
               if (e.key === "Enter" && !e.shiftKey) {
@@ -232,8 +225,8 @@ function Chatbot({
               }
             }}
           />
-          <button className="ml-2 w-[5%] h-full" onClick={handleSend}>
-            <img src={SendIcon} alt="send icon" />
+          <button className="p-2" onClick={handleSend}>
+            <img src={SendIcon} className="w-8 h-8" alt="send icon" />
           </button>
         </div>
       </div>

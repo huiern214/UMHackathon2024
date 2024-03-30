@@ -23,7 +23,8 @@ function DynamicSideBar({
 
   const [isAddTransaction, setIsAddTransaction] = useState(false);
   const [isShowTransactionTable, setIsShowTransactionTable] = useState(false);
-  const [transactionTableUser, setTransactionTableUser] = useState(selectedUser);
+  const [transactionTableUser, setTransactionTableUser] =
+    useState(selectedUser);
   const transactions = [
     {
       transactionID: "TRX20220328123461",
@@ -148,142 +149,152 @@ function DynamicSideBar({
     return (
       <div className="fixed inset-0 flex flex-col w-full bg-gray-800 bg-opacity-50 z-50">
         <div className="overflow-x-auto flex flex-col flex-1 mx-3 shadow-md sm:rounded-lg justify-center items-center">
-          <table className="table-auto w-[80%] h-[80%] text-sm text-right rtl:text-right text-gray-500 dark:text-gray-400">
-            <caption className="bg-gray-50 font-semibold text-xl text-black">
-              {transactionTableUser}'s Transactions
-            </caption>
-            <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-              <tr>
-                <th
-                  className="px-1 py-3 hover:text-black cursor-pointer"
-                  onClick={() => requestSort("transactionID")}
-                >
-                  {/* transactionID, date, transactionDetails, description, category, paymentMethod, withdrawalAmt, depositAmt */}
-                  Transaction ID{" "}
-                  {sortConfig["transactionID"] === null ? (
-                    ""
-                  ) : sortConfig["transactionID"] === "ascending" ? (
-                    <FaArrowDown className="w-4 h-4 inline-block mx-1 mb-1" />
-                  ) : (
-                    <FaArrowUp className="w-4 h-4 inline-block mx-1 mb-1" />
-                  )}
-                </th>
-                <th
-                  className="px-1 py-3 hover:text-black cursor-pointer text-right"
-                  onClick={() => requestSort("date")}
-                >
-                  Date{" "}
-                  {sortConfig["date"] === null ? (
-                    ""
-                  ) : sortConfig["date"] === "ascending" ? (
-                    <FaArrowDown className="w-4 h-4 inline-block mx-1 mb-1" />
-                  ) : (
-                    <FaArrowUp className="w-4 h-4 inline-block mx-1 mb-1" />
-                  )}
-                </th>
-                <th
-                  className="px-1 py-3 hover:text-black cursor-pointer"
-                  onClick={() => requestSort("transactionDetails")}
-                >
-                  Transaction Details{" "}
-                  {sortConfig["transactionDetails"] === null ? (
-                    ""
-                  ) : sortConfig["transactionDetails"] === "ascending" ? (
-                    <FaArrowDown className="w-4 h-4 inline-block mx-1 mb-1" />
-                  ) : (
-                    <FaArrowUp className="w-4 h-4 inline-block mx-1 mb-1" />
-                  )}
-                </th>
-                <th
-                  className="px-1 py-3 hover:text-black cursor-pointer"
-                  onClick={() => requestSort("description")}
-                >
-                  Description{" "}
-                  {sortConfig["description"] === null ? (
-                    ""
-                  ) : sortConfig["description"] === "ascending" ? (
-                    <FaArrowDown className="w-4 h-4 inline-block mx-1 mb-1" />
-                  ) : (
-                    <FaArrowUp className="w-4 h-4 inline-block mx-1 mb-1" />
-                  )}
-                </th>
-                <th
-                  className="px-1 py-3 hover:text-black cursor-pointer"
-                  onClick={() => requestSort("category")}
-                >
-                  Category{" "}
-                  {sortConfig["category"] === null ? (
-                    ""
-                  ) : sortConfig["category"] === "ascending" ? (
-                    <FaArrowDown className="w-4 h-4 inline-block mx-1 mb-1" />
-                  ) : (
-                    <FaArrowUp className="w-4 h-4 inline-block mx-1 mb-1" />
-                  )}
-                </th>
-                <th
-                  className="px-1 py-3 hover:text-black cursor-pointer"
-                  onClick={() => requestSort("paymentMethod")}
-                >
-                  Payment Method{" "}
-                  {sortConfig["paymentMethod"] === null ? (
-                    ""
-                  ) : sortConfig["paymentMethod"] === "ascending" ? (
-                    <FaArrowDown className="w-4 h-4 inline-block mx-1 mb-1" />
-                  ) : (
-                    <FaArrowUp className="w-4 h-4 inline-block mx-1 mb-1" />
-                  )}
-                </th>
-                <th
-                  className="px-1 py-3 hover:text-black cursor-pointer"
-                  onClick={() => requestSort("withdrawalAmt")}
-                >
-                  Withdrawal{" "}
-                  {sortConfig["withdrawalAmt"] === null ? (
-                    ""
-                  ) : sortConfig["withdrawalAmt"] === "ascending" ? (
-                    <FaArrowDown className="w-4 h-4 inline-block mx-1 mb-1" />
-                  ) : (
-                    <FaArrowUp className="w-4 h-4 inline-block mx-1 mb-1" />
-                  )}
-                </th>
-                <th
-                  className="px-1 py-3 hover:text-black cursor-pointer"
-                  onClick={() => requestSort("depositAmt")}
-                >
-                  Deposit{" "}
-                  {sortConfig["depositAmt"] === null ? (
-                    ""
-                  ) : sortConfig["depositAmt"] === "ascending" ? (
-                    <FaArrowDown className="w-4 h-4 inline-block mx-1 mb-1" />
-                  ) : (
-                    <FaArrowUp className="w-4 h-4 inline-block mx-1 mb-1" />
-                  )}
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {sortedItems.map((item, index) => (
+          <div className="rounded-xl border border-black flex flex-col bg-gray-50 items-center justify-center p-1">
+            <table className="table-auto text-sm text-right rtl:text-right text-gray-500 dark:text-gray-400">
+              <caption className="py-3 bg-gray-50 font-semibold text-xl text-black">
+                {transactionTableUser}'s Transactions
+              </caption>
+              <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                 <tr>
-                  {/* transactionID, date, transactionDetails, description, category, paymentMethod, withdrawalAmt, depositAmt */}
-                  <td className="py-2 bg-gray-50">{item.transactionID}</td>
-                  <td className="py-2 bg-gray-50">{item.date}</td>
-                  <td className="py-2 bg-gray-50">{item.transactionDetails}</td>
-                  <td className="py-2 bg-gray-50">{item.description}</td>
-                  <td className="py-2 bg-gray-50">{item.category}</td>
-                  <td className="py-2 bg-gray-50">{item.paymentMethod}</td>
-                  <td className="py-2 bg-gray-50">{item.withdrawalAmt}</td>
-                  <td className="py-2 bg-gray-50">{item.depositAmt}</td>
+                  <th
+                    className="px-1 py-3 hover:text-black cursor-pointer"
+                    onClick={() => requestSort("transactionID")}
+                  >
+                    {/* transactionID, date, transactionDetails, description, category, paymentMethod, withdrawalAmt, depositAmt */}
+                    Transaction ID{" "}
+                    {sortConfig["transactionID"] === null ? (
+                      ""
+                    ) : sortConfig["transactionID"] === "ascending" ? (
+                      <FaArrowDown className="w-4 h-4 inline-block mx-1 mb-1" />
+                    ) : (
+                      <FaArrowUp className="w-4 h-4 inline-block mx-1 mb-1" />
+                    )}
+                  </th>
+                  <th
+                    className="px-1 py-3 hover:text-black cursor-pointer text-right"
+                    onClick={() => requestSort("date")}
+                  >
+                    Date{" "}
+                    {sortConfig["date"] === null ? (
+                      ""
+                    ) : sortConfig["date"] === "ascending" ? (
+                      <FaArrowDown className="w-4 h-4 inline-block mx-1 mb-1" />
+                    ) : (
+                      <FaArrowUp className="w-4 h-4 inline-block mx-1 mb-1" />
+                    )}
+                  </th>
+                  <th
+                    className="px-1 py-3 hover:text-black cursor-pointer"
+                    onClick={() => requestSort("transactionDetails")}
+                  >
+                    Transaction Details{" "}
+                    {sortConfig["transactionDetails"] === null ? (
+                      ""
+                    ) : sortConfig["transactionDetails"] === "ascending" ? (
+                      <FaArrowDown className="w-4 h-4 inline-block mx-1 mb-1" />
+                    ) : (
+                      <FaArrowUp className="w-4 h-4 inline-block mx-1 mb-1" />
+                    )}
+                  </th>
+                  <th
+                    className="px-1 py-3 hover:text-black cursor-pointer"
+                    onClick={() => requestSort("description")}
+                  >
+                    Description{" "}
+                    {sortConfig["description"] === null ? (
+                      ""
+                    ) : sortConfig["description"] === "ascending" ? (
+                      <FaArrowDown className="w-4 h-4 inline-block mx-1 mb-1" />
+                    ) : (
+                      <FaArrowUp className="w-4 h-4 inline-block mx-1 mb-1" />
+                    )}
+                  </th>
+                  <th
+                    className="px-1 py-3 hover:text-black cursor-pointer"
+                    onClick={() => requestSort("category")}
+                  >
+                    Category{" "}
+                    {sortConfig["category"] === null ? (
+                      ""
+                    ) : sortConfig["category"] === "ascending" ? (
+                      <FaArrowDown className="w-4 h-4 inline-block mx-1 mb-1" />
+                    ) : (
+                      <FaArrowUp className="w-4 h-4 inline-block mx-1 mb-1" />
+                    )}
+                  </th>
+                  <th
+                    className="px-1 py-3 hover:text-black cursor-pointer"
+                    onClick={() => requestSort("paymentMethod")}
+                  >
+                    Payment Method{" "}
+                    {sortConfig["paymentMethod"] === null ? (
+                      ""
+                    ) : sortConfig["paymentMethod"] === "ascending" ? (
+                      <FaArrowDown className="w-4 h-4 inline-block mx-1 mb-1" />
+                    ) : (
+                      <FaArrowUp className="w-4 h-4 inline-block mx-1 mb-1" />
+                    )}
+                  </th>
+                  <th
+                    className="px-1 py-3 hover:text-black cursor-pointer"
+                    onClick={() => requestSort("withdrawalAmt")}
+                  >
+                    Withdrawal{" "}
+                    {sortConfig["withdrawalAmt"] === null ? (
+                      ""
+                    ) : sortConfig["withdrawalAmt"] === "ascending" ? (
+                      <FaArrowDown className="w-4 h-4 inline-block mx-1 mb-1" />
+                    ) : (
+                      <FaArrowUp className="w-4 h-4 inline-block mx-1 mb-1" />
+                    )}
+                  </th>
+                  <th
+                    className="px-1 py-3 hover:text-black cursor-pointer"
+                    onClick={() => requestSort("depositAmt")}
+                  >
+                    Deposit{" "}
+                    {sortConfig["depositAmt"] === null ? (
+                      ""
+                    ) : sortConfig["depositAmt"] === "ascending" ? (
+                      <FaArrowDown className="w-4 h-4 inline-block mx-1 mb-1" />
+                    ) : (
+                      <FaArrowUp className="w-4 h-4 inline-block mx-1 mb-1" />
+                    )}
+                  </th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-          <div className="flex items-center justify-center">
-            <button
-              className="border border-black bg-white p-2 rounded-md hover:bg-gray-200"
-              onClick={closeTransactionsTable}
-            >
-              Cancel
-            </button>
+              </thead>
+              <tbody>
+                {sortedItems.map((item, index) => (
+                  <tr>
+                    {/* transactionID, date, transactionDetails, description, category, paymentMethod, withdrawalAmt, depositAmt */}
+                    <td className="px-2 py-2 bg-gray-50">
+                      {item.transactionID}
+                    </td>
+                    <td className="px-2 py-2 bg-gray-50">{item.date}</td>
+                    <td className="px-2 py-2 bg-gray-50">
+                      {item.transactionDetails}
+                    </td>
+                    <td className="px-2 py-2 bg-gray-50">{item.description}</td>
+                    <td className="px-2 py-2 bg-gray-50">{item.category}</td>
+                    <td className="px-2 py-2 bg-gray-50">
+                      {item.paymentMethod}
+                    </td>
+                    <td className="px-2 py-2 bg-gray-50">
+                      {item.withdrawalAmt}
+                    </td>
+                    <td className="px-2 py-2 bg-gray-50">{item.depositAmt}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            <div className="flex items-center justify-center">
+              <button
+                className="border border-black bg-white p-2 rounded-md hover:bg-gray-200"
+                onClick={closeTransactionsTable}
+              >
+                Cancel
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -580,16 +591,19 @@ function DynamicSideBar({
 
   const UploadTransactionSideBar = () => {
     return (
-      <div style={{ display: isSideBarHidden ? "none" : "block" }}>
+      <div
+        className="overflow-y-auto"
+        style={{ display: isSideBarHidden ? "none" : "block" }}
+      >
         {isShowTransactionTable && (
           <UserTransactionTable transactionItems={transactions} />
         )}
         {isAddTransaction && <AddTransactionWindow />}
         {isUserTransactionDropDown.map((user, index) => (
-          <div className="flex flex-col ml-2 mt-2">
-            <div className="flex mt-6">
+          <div className="flex flex-col my-5">
+            <div className="flex ml-5 items-center">
               <button
-                className="font-semibold"
+                className="font-semibold p-2 hover:bg-gray-200"
                 onClick={() => handleShowTransactionsTable({ user })}
               >
                 {user.name + "'s transactions"}
@@ -597,6 +611,7 @@ function DynamicSideBar({
               <button onClick={() => handleUserTransactionsDropDown({ user })}>
                 <img
                   src={user.isDropDown ? ArrowDown : OpenSideBarIcon}
+                  className="rounded-full border border-black hover:bg-white"
                   alt="drow down"
                 />
               </button>
@@ -604,20 +619,28 @@ function DynamicSideBar({
             {user.isDropDown ? (
               <div className="ml-4">
                 <button
-                  className="flex"
+                  className="flex p-2 bg-primary text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 items-center justify-center m-1"
                   onClick={() => handleUserUploadTransactions({ user })}
                 >
                   <div>
-                    <img src={PlusIcon} alt="upload transactions" />
+                    <img
+                      src={PlusIcon}
+                      className="w-5 h-5 mr-1"
+                      alt="upload transactions"
+                    />
                   </div>
                   <p>Upload transactions</p>
                 </button>
                 <button
-                  className="flex"
+                  className="flex p-2 bg-primary text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 m-1 justify-center items-center"
                   onClick={() => handleUserAddTransactions({ user })}
                 >
                   <div>
-                    <img src={PlusIcon} alt="add transactions" />
+                    <img
+                      src={PlusIcon}
+                      className="w-5 h-5 mr-1"
+                      alt="add transactions"
+                    />
                   </div>
                   <p>Add transactions</p>
                 </button>
@@ -642,35 +665,40 @@ function DynamicSideBar({
       setSelectedMonth(event.target.value);
     };
 
-    // Define the handlePrediction function
-    const handlePrediction = () => {
-      // Logic for prediction goes here
-      console.log("Predicting expenses for next month...");
-    };
+    const [modal, setModal] = useState(false);
+    const toggleModal = () => setModal(!modal);
 
     return (
-      <div className="flex flex-col justify-center items-center">
+      <div className="flex flex-col overflow-y-auto items-center">
         <button
-          onClick={handlePrediction}
-          className="mt-4 mb-4"
-          style={{
-            border: "1px solid black",
-            padding: "4px 8px",
-            borderRadius: "4px",
-            backgroundColor: "transparent",
-            cursor: "pointer",
-          }}
+          onClick={toggleModal}
+          className="m-4 rounded-xl border border-black p-2 bg-gray-700 hover:bg-gray-500 text-white"
         >
           Predict Next Month Expenses
         </button>
 
+        {modal && (
+          <div className="z-[50] fixed inset-0 flex items-center justify-center h-screen">
+            <div className="absolute inset-0 bg-black/80"></div>
+            <div className="modal-content absolute h-auto w-auto bg-[#FFFFFF] overflow-y-auto rounded-lg">
+              <div className="bg-purple-500 h-64 w-64"></div>
+              <button
+                className="p-2 border bg-white border-black rounded-xl hover:bg-gray-200"
+                onClick={toggleModal}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        )}
         <div>
-          <h3 className="font-bold">Top 5 Category Expenses by Month</h3>
+          <h3 className="font-bold mb-2">Top 5 Category Expenses by Month</h3>
           <div>
             <label htmlFor="monthSelect">Select Month:</label>
             <select
               id="monthSelect"
               value={selectedMonth}
+              className="ml-4 border border-gray-200 rounded-md p-1"
               onChange={handleMonthChange}
             >
               {months.map((month) => (
@@ -680,18 +708,19 @@ function DynamicSideBar({
               ))}
             </select>
           </div>
-          <div>
+          <div className="mb-2">
             <PieChart id="pie1" />
           </div>
         </div>
 
         <div className="mt-5">
-          <h3 className="font-bold">Top 5 Category Expenses by Month</h3>
+          <h3 className="font-bold mb-2">Top 5 Category Expenses by Month</h3>
           <div>
             <label htmlFor="monthSelect">Select Month:</label>
             <select
               id="monthSelect"
               value={selectedMonth}
+              className="ml-4 border border-gray-200 rounded-md p-1"
               onChange={handleMonthChange}
             >
               {months.map((month) => (
@@ -701,7 +730,7 @@ function DynamicSideBar({
               ))}
             </select>
           </div>
-          <div>
+          <div className="mb-2">
             <PieChart id="pie2" />
           </div>
         </div>
@@ -709,11 +738,9 @@ function DynamicSideBar({
     );
   };
 
-
   const ChatHistorySideBar = () => {
-
     const [allChat, setAllChat] = useState([]);
-    
+
     const OpenNewChat = () => {
       const newChat = {
         chatId: "",
@@ -725,48 +752,47 @@ function DynamicSideBar({
       setConversation([]);
     };
 
-
     // by tableId
     const fetchAllChats = async (e) => {
       console.log("fetching all chats");
       try {
-        console.log('selectedUser',selectedUser);
-        const input = { "tableId": selectedUser.tableID }
+        console.log("selectedUser", selectedUser);
+        const input = { tableId: selectedUser.tableID };
         // console.log(input);
-        const response = await api.post("/chatbot/retrieveChats", 
-          input
-        );
+        const response = await api.post("/chatbot/retrieveChats", input);
         // console.log('responseData',response.data);
         setAllChat(response.data.chats);
         // console.log(response.data.chats);
       } catch (error) {
         console.error(error);
       }
-    }
-    
+    };
+
     useEffect(() => {
       fetchAllChats();
-    }
-    ,[selectedUser]);
+    }, [selectedUser]);
 
     return (
       <div
-        className="flex flex-col w-full h-full overflow-y-auto"
+        className="flex flex-col overflow-y-auto items-center justify-center"
         style={{ display: isSideBarHidden ? "none" : "block" }}
       >
         <button
-          className="flex w-fit mt-2 ml-3 hover:bg-gray-300 hover:border rounded-lg"
+          className="flex m-4 rounded-xl border border-black p-2 bg-gray-700 hover:bg-gray-500"
           onClick={OpenNewChat}
         >
-          <img src={PlusIcon} alt="open new chat" />
-          <div className="">New Chat</div>
+          <img className="w-6 h-6 mr-2" src={PlusIcon} alt="open new chat" />
+          <div className="text-white">New Chat</div>
         </button>
-        <div className="flex flex-col w-full mt-2 ml-3">
+        <div className="flex flex-col w-full">
           {allChat.length > 0 ? (
             <div className="flex flex-col w-full my-2">
               <div>Chat Session</div>
               {allChat.map((chat, index) => (
-                <IndividualChatHistory chatTitle={chat.chatName} chatId={chat.chatId} />
+                <IndividualChatHistory
+                  chatTitle={chat.chatName}
+                  chatId={chat.chatId}
+                />
               ))}
             </div>
           ) : (
@@ -778,26 +804,27 @@ function DynamicSideBar({
   };
 
   const openConversation = async (chatId) => {
-    setConversation([])
+    setConversation([]);
     //get conversation from chatId
     try {
-      console.log('chatId',chatId);
-      const input = { "chatId": chatId }
+      console.log("chatId", chatId);
+      const input = { chatId: chatId };
       // console.log(input);
-      const response = await api.post("/chatbot/retrieveChatHistory", 
-        input
-      );
+      const response = await api.post("/chatbot/retrieveChatHistory", input);
       console.log(response.data.response);
       setConversation(response.data.response);
       setCurrentChatId(chatId);
     } catch (error) {
       console.error(error);
-      }
-  }
-      
+    }
+  };
+
   const IndividualChatHistory = ({ chatTitle, chatId }) => {
     return (
-      <button className="flex w-fit items-center pr-10 my-1 hover:bg-gray-300 hover:border rounded-lg" onClick={() => openConversation(chatId)}>
+      <button
+        className="flex w-fit items-center pr-10 my-1 hover:bg-gray-300 hover:border rounded-lg"
+        onClick={() => openConversation(chatId)}
+      >
         <img src={ChatIcon} alt="chat" className="h-4 w-4 mt-1" />
         <div className="ml-2">{chatTitle ? chatTitle : "New Chat"}</div>
       </button>
