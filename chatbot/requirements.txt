@@ -4,3 +4,9 @@ langchain_openai
 langchain_google_genai
 langchain_community
 firebase_admin
+Django
+psycopg2
+psycopg2-binary
+supabase_client
+supabase_py
+matplotlib

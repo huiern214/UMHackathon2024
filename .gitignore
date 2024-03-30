@@ -1,3 +1,5 @@
 chatbot/__pycache__
 chatbot/config.py
 .DS_Store
+server/*/__pycache__
+server/*/*/__pycache__
