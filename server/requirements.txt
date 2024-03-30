@@ -11,3 +11,4 @@ supabase_client
 supabase
 matplotlib
 django-cors-headers
+prophet

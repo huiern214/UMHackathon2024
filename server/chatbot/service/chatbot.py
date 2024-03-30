@@ -10,6 +10,7 @@ from langchain_openai import ChatOpenAI
 import firebase_admin
 from firebase_admin import credentials, firestore
 from .config import OPENAI_API_KEY
+from google.cloud.firestore_v1.base_query import FieldFilter
 
 cred = credentials.Certificate("./chatbot/service/firebase_key.json")
 firebase_admin.initialize_app(cred)
@@ -21,15 +22,18 @@ API_KEY = OPENAI_API_KEY
 
 def create_new_chat(userId: int = 1, tableId: int = 1, chatName: str = "New Chat"):
     """Add a new chat document to the "chats" collection and return the document ID"""
-    query_collection = firestore_client.collection("chats")
-    query_document = query_collection.add({
+    chat_collection = firestore_client.collection("chats")
+    query_document = chat_collection.add({
         "userId": userId,
         "tableId": tableId,
         "chatName": chatName,
         "history": []
     })
-    query_id = query_document[1].id
-    return query_id
+    chat_id = query_document[1].id
+    
+    query = "INSERT INTO Chats (userId, chatId, tableId, chatName) VALUES ({}, '{}', {}, '{}');".format(userId, chat_id, tableId, chatName)
+    db._execute(query)
+    return chat_id
 
 
 def get_search_results(userPrompt: str, tableId: int = 1):
@@ -77,6 +81,8 @@ def get_search_results(userPrompt: str, tableId: int = 1):
         search_results += f"{key}: "
         search_results += ", ".join(search_dict.get(key))
         search_results += "\n"
+        
+    search_results + "\n\nExpenses means withdrawalAmt, Earn means depositAmt\n\n"
     return search_results
 
 
@@ -123,12 +129,17 @@ def print_get_Sql_chain(userPrompt, chat_history, tableId):
     sql_query = sql_chain.invoke(
         {"question": question, "chat_history": chat_history, "tableId": tableId, "search_results": search_results})
 
-    # use the sql to execute on the database
-    transactionData = db._execute(sql_query)
-    # print(f"Transaction Data: {transactionData}")
-        
     # Now you can use the sql_query string for further processing, like executing it on your database.
     print(f"Generated SQL Query: {sql_query}")
+    # use the sql to execute on the database
+    # transactionData = db._execute(sql_query)
+    # do exception handling for the sql query
+    transactionData = []
+    try:
+        transactionData = db._execute(sql_query)
+    except Exception as e:
+        print(f"Error: {e}")
+    # print(f"Transaction Data: {transactionData}")
     
     return transactionData
 
@@ -198,6 +209,8 @@ def get_response(user_query: str = "", userId: int = None, tableId: str = "", ch
         RunnablePassthrough.assign(query=sql_chain).assign(
             schema=lambda _: db.get_table_info(),
             response=lambda vars: db.run(vars["query"]),
+            # Limit the response to 20 transactions
+            # response=lambda vars: db.run(vars["query"])[:20]
         )
         | prompt
         | llm
@@ -240,15 +253,38 @@ def retrieve_chat_history(chatId: str):
     return messages
 
 
+# def retrieve_chats_by_tableId(tableId: int):
+#     query = firestore_client.collection("chats").where(filter=FieldFilter("tableId", "==", tableId))
+#     # query = firestore_client.collection("chats").where("tableId", "==", tableId)
+#     queryDocument = query.stream()
+#     chats = []
+#     for document in queryDocument:
+#         # get chat id and chat name
+#         chat = document.to_dict()
+#         chats.append({"chatId": document.id, "chatName": chat.get("chatName")})
+#     return chats
+
 def retrieve_chats_by_tableId(tableId: int):
-    query = firestore_client.collection("chats").where("tableId", "==", tableId)
-    queryDocument = query.stream()
+    # retrieve chatId and chatName from the sqlite database
+    query = "SELECT chatId, chatName FROM Chats WHERE tableId = " + str(tableId) + ";"
     chats = []
-    for document in queryDocument:
-        # get chat id and chat name
-        chat = document.to_dict()
-        chats.append({"chatId": document.id, "chatName": chat.get("chatName")})
+    try:
+        chats = db._execute(query)
+    except Exception as e:
+        print(f"Error: {e}")
     return chats
+
+def retrieve_all_tables(userId: int = 1):
+    db = SQLDatabase.from_uri(db_uri)
+    query = f"SELECT transactionTableID AS tableID, transactionTableName AS tableName FROM TransactionTables WHERE userID = {userId};"
+    tables = []
+    try:
+        tables = db._execute(query)
+        print("Tables: ", tables)
+    except Exception as e:
+        print(f"Error: {e}")
+    return tables
+
 
 # chatId = create_new_chat(1, 3)
 # chatId = "G29z15gR7MvP3FVlBni8"  # chatId for user 1 and table 1
