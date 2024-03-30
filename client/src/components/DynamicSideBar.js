@@ -6,7 +6,7 @@ import { ReactComponent as XMark } from "../assets/xmark.svg";
 import Chatbot from "./Chatbot";
 import { useState, useEffect } from "react";
 import { FaPlus, FaArrowDown, FaArrowUp } from "react-icons/fa";
-import PieChart from "./pieChart";
+import PieChart from "../pages/Analysis/pieChart";
 import api from "../api/axiosConfig";
 
 function DynamicSideBar({
@@ -448,102 +448,12 @@ function DynamicSideBar({
                 Describe the transaction.
               </p>
             </div>
-        )
-    }
-
-    const ChatHistorySideBar=()=>{
-        const OpenNewChat=()=>{
-            const newChat={
-                "date":"today",
-                "title":"1Month Spending",
-                "content":{},
-            }
-
-            setChatHistory([...chatHistory,newChat]);
-
-            //open a new chat
-            setConversation([])
-        }
-
-        let todayChat = [];
-        let ytdChat = [];
-        let thisMonthChat = [];
-        let allOtherChat = [];
-    
-        for (let i = 0; i < chatHistory.length; i++) {
-            let chat = chatHistory[i];
-            if (chat.date === "today") {
-                todayChat.push(chat);
-            } else if (chat.date === "yesterday") {
-                ytdChat.push(chat);
-            } else if (chat.date === "This month") {
-                thisMonthChat.push(chat);
-            } else {
-                allOtherChat.push(chat);
-            }
-        }
-
-        return(
-            <div className="flex flex-col w-full h-full overflow-y-auto" style={{ display: isSideBarHidden ? 'none' : 'block'}}>
-                <button className='flex w-fit mt-2 ml-3 hover:bg-gray-300 hover:border rounded-lg' onClick={OpenNewChat}>
-                    <img src={PlusIcon} alt="open new chat"/>
-                    <div className=''>New chat</div>
-                </button>
-                <div className='flex flex-col w-full mt-2 ml-3 '>
-                    {todayChat.length>0?
-                        <div className='flex flex-col w-full my-2'>
-                            <div>Today</div>
-                            {todayChat.map((chat,index)=>(
-                                <IndividualChatHistory chatTitle={chat.title}/>
-                            ))}
-                        </div>
-                    :
-                        <div></div>
-                    }
-                </div>
-              </div>
-            </div>
-
-            <div className="mt-5 ml-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
-              <div className="sm:col-span-4">
-                <label
-                  htmlFor="depositAmt"
-                  className="block text-sm font-medium leading-6 text-gray-900"
-                >
-                  Deposit Amount
-                </label>
-                <div className="mt-2">
-                  <div className="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-blue-500 sm:max-w-md">
-                    <input
-                      type="number"
-                      name="depositAmt"
-                      id="depositAmt"
-                      step="0.01"
-                      className="block flex-1 border-0 bg-transparent py-1.5 pl-3 text-gray-900 placeholder:text-gray-400 focus:ring-0  sm:text-sm   sm:leading-6"
-                      required
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="my-6 mr-10 flex items-center justify-end gap-x-6">
-              <button
-                type="button"
-                className="rounded-md text-sm px-3 py-2 font-semibold leading-6 text-gray-900 hover:bg-gray-300 hover:border hover:border-black"
-                onClick={handleUserAddTransactions}
-              >
-                Cancel
-              </button>
-              <button className="rounded-md bg-primary px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                Save
-              </button>
-            </div>
           </form>
         </div>
       </div>
-    );
-  };
+        )
+    }
+
 
   const UploadTransactionSideBar = () => {
     return (
@@ -598,89 +508,88 @@ function DynamicSideBar({
     );
   };
 
-const AnalysisSideBar=()=>{
-        const [selectedMonth1, setSelectedMonth1] = useState('January'); // Initial selected month state for pie1
-        const [selectedMonth2, setSelectedMonth2] = useState('January'); // Initial selected month state for pie2
-        const [chartData, setChartData] = useState({
-            "Other Expenses": 242385.91,
-            "Government Services": 78652.37,
-            "Utilities": 32814.15,
-            "Debts/Overpayments": 31770.46,
-            "Insurance": 11530
-        }); // Initial dummy data for pie chart
+  const AnalysisSideBar=()=>{
+    const [selectedMonth1, setSelectedMonth1] = useState('January'); // Initial selected month state for pie1
+    const [selectedMonth2, setSelectedMonth2] = useState('January'); // Initial selected month state for pie2
+    const [chartData, setChartData] = useState({
+        "Other Expenses": 242385.91,
+        "Government Services": 78652.37,
+        "Utilities": 32814.15,
+        "Debts/Overpayments": 31770.46,
+        "Insurance": 11530
+    }); // Initial dummy data for pie chart
 
-        // Define an array of months for the dropdown options
-        const months = ['January', 'February', 'March'];
+    // Define an array of months for the dropdown options
+    const months = ['January', 'February', 'March'];
 
-        // Function to handle the change in the selected month for pie1
-        const handleMonthChange1 = (event) => {
-            setSelectedMonth1(event.target.value);
-        };
+    // Function to handle the change in the selected month for pie1
+    const handleMonthChange1 = (event) => {
+        setSelectedMonth1(event.target.value);
+    };
 
-        // Function to handle the change in the selected month for pie2
-        const handleMonthChange2 = (event) => {
-            setSelectedMonth2(event.target.value);
-        };
+    // Function to handle the change in the selected month for pie2
+    const handleMonthChange2 = (event) => {
+        setSelectedMonth2(event.target.value);
+    };
 
-        // Define the handlePrediction function
-        const handlePrediction = () => {
-            // Logic for prediction goes here
-            console.log('Predicting expenses for next month...');
-        };
+    // Define the handlePrediction function
+    const handlePrediction = () => {
+        // Logic for prediction goes here
+        console.log('Predicting expenses for next month...');
+    };
 
-        return (
-            <div className='flex flex-col justify-center items-center'>
-            <button
-                onClick={handlePrediction}
-                className='mt-4 mb-4'
-                style={{
-                border: '1px solid black',
-                padding: '4px 8px',
-                borderRadius: '4px',
-                backgroundColor: 'transparent',
-                cursor: 'pointer',
-                }}
-            >
-                Predict Next Month Expenses
-            </button>
+    return (
+        <div className='flex flex-col justify-center items-center'>
+        <button
+            onClick={handlePrediction}
+            className='mt-4 mb-4'
+            style={{
+            border: '1px solid black',
+            padding: '4px 8px',
+            borderRadius: '4px',
+            backgroundColor: 'transparent',
+            cursor: 'pointer',
+            }}
+        >
+            Predict Next Month Expenses
+        </button>
 
+        <div>
+            <h3 className="font-bold">Top 5 Category Expenses by Month</h3>
             <div>
-                <h3 className="font-bold">Top 5 Category Expenses by Month</h3>
-                <div>
-                <label htmlFor="monthSelect1">Select Month:</label>
-                <select id="monthSelect1" value={selectedMonth1} onChange={handleMonthChange1}>
-                    {months.map((month) => (
-                    <option key={month} value={month}>{month}</option>
-                    ))}
-                </select>
-                </div>
-                <div>
-                <PieChart id="pie1" data={chartData} />
-                </div>
+            <label htmlFor="monthSelect1">Select Month:</label>
+            <select id="monthSelect1" value={selectedMonth1} onChange={handleMonthChange1}>
+                {months.map((month) => (
+                <option key={month} value={month}>{month}</option>
+                ))}
+            </select>
             </div>
-
-            <div className='mt-5'>
-                <h3 className="font-bold">Top 5 Category Expenses by Month</h3>
-                <div>
-                <label htmlFor="monthSelect2">Select Month:</label>
-                <select id="monthSelect2" value={selectedMonth2} onChange={handleMonthChange2}>
-                    {months.map((month) => (
-                    <option key={month} value={month}>{month}</option>
-                    ))}
-                </select>
-                </div>
-                <div>
-                <PieChart id="pie2" data={chartData} />
-                </div>
+            <div>
+            <PieChart id="pie1" data={chartData} />
             </div>
+        </div>
+
+        <div className='mt-5'>
+            <h3 className="font-bold">Top 5 Category Expenses by Month</h3>
+            <div>
+            <label htmlFor="monthSelect2">Select Month:</label>
+            <select id="monthSelect2" value={selectedMonth2} onChange={handleMonthChange2}>
+                {months.map((month) => (
+                <option key={month} value={month}>{month}</option>
+                ))}
+            </select>
             </div>
-        );
-        }
+            <div>
+            <PieChart id="pie2" data={chartData} />
+            </div>
+        </div>
+        </div>
+    );
+    }
 
-  const ChatHistorySideBar = () => {
-
+  const ChatHistorySideBar = () => {   
     const [allChat, setAllChat] = useState([]);
-    
+
     const OpenNewChat = () => {
       const newChat = {
         chatId: "",
@@ -715,6 +624,8 @@ const AnalysisSideBar=()=>{
       fetchAllChats();
     }
     ,[selectedUser]);
+    
+    
 
     return (
       <div

@@ -80,24 +80,92 @@ function Chatbot({
     );
   };
 
-    const handleSend=()=>{
-        const currentTime = new Date().toLocaleTimeString();
-        const newMessage={
-            text:message,
-            sender:'user',
-            timeStamp:currentTime
+    const handleSend = async () => {
+      const currentTime = new Date().toLocaleTimeString();
+      const newMessage = {
+        author: "user",
+        content: message,
+        timestamp: currentTime,
+      };
+  
+      const newConversation = [...conversation, newMessage];
+      setConversation(newConversation);
+  
+      try {
+        const input = {
+          "userPrompt": message,
+          "userId": 1,
+          "tableId": selectedUser.tableId,
+          // "tableId": 1, // hardcoded for now
+          "chatId": currentChatId
         }
-        const chatbotResponse={
-            text:'Chatbot response',
-            sender:'chatbot',
-            timeStamp:currentTime
+        console.log("input");
+        console.log(input);
+        const response = await api.post("/chatbot/generateChatResponse", 
+          input
+        );
+        
+        console.log(response.data);
+        const botReponse = response.data.response.response;
+        const transactionData = response.data.response.transactionData;
+        const chatId = response.data.response.chatId;
+  
+        if (currentChatId == "") {
+          setCurrentChatId(chatId);
         }
-        // const chatbotResponse = generateChatbotResponse(message); //Call generateChatbotResponse function
-        const newConversation=[...conversation,newMessage,chatbotResponse];
-        setConversation(newConversation);
+  
+        const chatbotResponse = {
+          author: "bot",
+          content: botReponse,
+          timestamp: currentTime,
+        };
+        const generatedGraph = generateChatbotResponse(message); //Call generateChatbotResponse function
 
-        setMessage("")
-    }
+        // if generateChatbotResponse not return {}, then reamin the same, else use the response from generateChatbotResponse
+        if (generatedGraph .content === undefined) {
+          console.log("No graph to render");
+        } else {
+          chatbotResponse.content = generatedGraph.content;
+          chatbotResponse.graphType = generatedGraph.graphType;
+          chatbotResponse.data = generatedGraph.data;
+        }
+
+        const newConversation = [...conversation, newMessage, chatbotResponse];
+        setConversation(newConversation);
+        
+        console.log(response.data.tables);
+      } catch (error) {
+        console.error(error);
+      }
+  
+      // Example Bot Response
+      // "response": {
+      //   "response": "The coffee transaction data you requested includes two entries. The first transaction occurred on January 6th at a Coffee Shop, paid in cash for $20. The second transaction took place on January 8th at the same Coffee Shop, paid with a debit card for $15.",
+      //   "chatId": "2tltHUTArqqOJIatgM9J",
+      //   "transactionData": [
+      //       {
+      //           "transactionTableID": 1,
+      //           "transactionID": "TRX20220328123527",
+      //           "date": "2024-01-06",
+      //           "transactionDetails": "Coffee Shop",
+      //           "description": "Expenses for coffee and snacks",
+      //           "category": "Dining",
+      //           "paymentMethod": "Cash",
+      //           "withdrawalAmt": 20.0,
+      //           "depositAmt": null
+      //       },
+  
+      // const chatbotResponse = {
+      //   text: "Chatbot response",
+      //   sender: "chatbot",
+      //   timeStamp: currentTime,
+      // };
+      // const newConversation = [...conversation, newMessage, chatbotResponse];
+      // setConversation(newConversation);
+  
+      setMessage("");
+    };
+  
 
     //generateChatbotResponse function
     const generateChatbotResponse = (userInput) => {
@@ -115,17 +183,14 @@ function Chatbot({
           console.log('Pie Chart Data:', data.data);
 
           return {
-            text: `Generating ${graphType} graph...`,
-            sender: 'chatbot',
-            timeStamp: new Date().toLocaleTimeString(),
+            content: `Generating ${graphType} graph...`,
+            author: 'chatbot',
+            timestamp: new Date().toLocaleTimeString(),
             graphType,
             data,
           };
         } else {
           return {
-            text: 'Your message does not contain keywords related to graph plotting.',
-            sender: 'chatbot',
-            timeStamp: new Date().toLocaleTimeString(),
           };
         }
       };
@@ -135,10 +200,12 @@ function Chatbot({
         if (messageContainerRef.current) {
           messageContainerRef.current.scrollTop = messageContainerRef.current.scrollHeight;
         }
+        console.log(conversation)
       }, [conversation]);
     
     useEffect(() => {
-        setConversation([])
+      setConversation([])
+      setCurrentChatId([])
     }, [selectedUser]);
 
     // Function to add indices to labels
@@ -195,7 +262,9 @@ function Chatbot({
                   <div className="ml-2 w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center">
                     {/* <img alt='user profile pic'/> */}
                   </div>
-                    <div className="ml-2">Chatbot</div>
+                  <div className="ml-2">Chatbot</div>
+                  </div>
+                    <div className="mt-3 ml-3 text-left">{msg.content}</div>
                     {/* Render the graph based on chatbot's response */}
                     {msg.graphType && (
                       <div className='flex justify-center items-center mt-3'>
@@ -210,10 +279,8 @@ function Chatbot({
                           {msg.graphType === 'bar' && <div><BarGraph labels={msg.data.labels} data={msg.data.data}/></div>}
                           {msg.graphType === 'line' && <div><LineGraph data={msg.data}/></div>}
                       </div>
-                      )}
-                </div>
-                <div className="mt-3 ml-3 text-left">{msg.content}</div>
-              </div>
+                    )}
+                  </div>
             )
           )}
         </div>
