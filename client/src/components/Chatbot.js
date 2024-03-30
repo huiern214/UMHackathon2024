@@ -112,7 +112,7 @@ function Chatbot({
         timestamp: currentTime,
       };
 
-      const newConversation = [...conversation, chatbotResponse];
+      const newConversation = [...conversation, newMessage, chatbotResponse];
       setConversation(newConversation);
       
       console.log(response.data.tables);

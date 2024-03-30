@@ -732,13 +732,13 @@ function DynamicSideBar({
       try {
         console.log('selectedUser',selectedUser);
         const input = { "tableId": selectedUser.tableID }
-        // console.log(input);
+        console.log("hellooooooooooooo",input);
         const response = await api.post("/chatbot/retrieveChats", 
           input
         );
         // console.log('responseData',response.data);
         setAllChat(response.data.chats);
-        // console.log(response.data.chats);
+        console.log(response.data.chats);
       } catch (error) {
         console.error(error);
       }
