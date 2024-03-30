@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'transaction',
     'analysis',
     'chatbot',
+    'susDetect',
 ]
 
 MIDDLEWARE = [
