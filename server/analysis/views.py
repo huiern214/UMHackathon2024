@@ -5,6 +5,75 @@ import json
 from django.http import JsonResponse
 from .service.categoryExpensesByMonth import calculate_expenses_for_month
 from .service.paymentMethodExpenses import calculate_sum_by_payment_method
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from .service.trendAnalysis import predict_trend, get_all_expenses, get_all_income
+
+@csrf_exempt
+def predict_expenses_trend(request):
+    if request.method == 'POST':
+        data = json.loads(request.body.decode('utf-8'))
+        tableId = data.get('tableId', 1)
+
+        # Get all expenses
+        dates, withdrawal_amts = get_all_expenses(tableId)
+
+        # Predict trend
+        prediction = predict_trend(dates, withdrawal_amts)
+
+        return JsonResponse(prediction, safe=False)
+
+    return JsonResponse({'error': 'Invalid request'})
+
+@csrf_exempt
+def get_expenses_data(request):
+    if request.method == 'POST':
+        data = json.loads(request.body.decode('utf-8'))
+        tableId = data.get('tableId', 1)
+        
+        # Get all expenses
+        dates, withdrawal_amts = get_all_expenses(tableId)
+
+        result = []
+        for i in range(len(dates)):
+            result.append({'date': dates[i], 'amt': withdrawal_amts[i]})
+        
+        return JsonResponse(result, safe=False)
+    
+    return JsonResponse({'error': 'Invalid request'})
+
+@csrf_exempt
+def predict_income_trend(request):
+    if request.method == 'POST':
+        data = json.loads(request.body.decode('utf-8'))
+        tableId = data.get('tableId', 1)
+
+        # Get all income
+        dates, deposit_amts = get_all_income(tableId)
+
+        # Predict trend
+        prediction = predict_trend(dates, deposit_amts)
+
+        return JsonResponse(prediction, safe=False)
+
+    return JsonResponse({'error': 'Invalid request'})
+
+@csrf_exempt
+def get_income_data(request):
+    if request.method == 'POST':
+        data = json.loads(request.body.decode('utf-8'))
+        tableId = data.get('tableId', 1)
+        
+        # Get all income
+        dates, deposit_amts = get_all_income(tableId)
+        
+        result = []
+        for i in range(len(dates)):
+            result.append({'date': dates[i], 'amt': deposit_amts[i]})
+
+        return JsonResponse(result, safe=False)
+
+    return JsonResponse({'error': 'Invalid request'})
 
 # Create your views here.
 @csrf_exempt

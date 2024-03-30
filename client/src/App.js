@@ -8,6 +8,7 @@ import ChatBotPage from "./pages/ChatbotPage";
 import WithNavbar from "./components/WithNavbar";
 import NotFound404 from "./pages/NotFound404";
 import Footer from "./components/Footer";
+import Prediction from "./components/Prediction";
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
           <Route path="/" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/chatbot" element={<ChatBotPage />} />
+          <Route path="/predict" element={<Prediction />} />
           {/* <Route element={<WithNavbar />}> */}
           <Route path="*" element={<NotFound404 />} />
           {/* </Route> */}
