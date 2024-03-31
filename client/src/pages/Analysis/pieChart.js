@@ -3,15 +3,17 @@ import Chart from 'chart.js/auto';
 
 const PieChart = ({id, data}) => {
   console.log('PieChart Props:', id, data);
+  console.log('PieChart Keys:', Object.keys(data || {}));
+  console.log('PieChart Values:', Object.values(data || {}));
 
-  const [chartInstance,setChartInstance]=useState(null);
+  const [chartInstance, setChartInstance] = useState(null);
 
   useEffect(()=>{  
     renderChart();
     return()=>{
       destroyChart();
     }
-  },[]);
+  },[data]);
 
   const destroyChart =()=>{
     if(chartInstance){
@@ -33,7 +35,7 @@ const PieChart = ({id, data}) => {
         datasets: [
           {
             data: Object.values(data || {}),
-            backgroundColor: ['red', 'blue', 'yellow', 'green', 'orange'], // Update with appropriate colors
+            backgroundColor: ['red', 'blue', 'yellow', 'green', 'orange', 'purple', 'pink', 'brown', 'grey', 'black'],
           },
         ],
       },
