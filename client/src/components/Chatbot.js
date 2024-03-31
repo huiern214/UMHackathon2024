@@ -104,7 +104,7 @@ function Chatbot({
         const input = {
           userPrompt: message,
           userId: 1,
-          tableId: selectedUser.tableId,
+          tableId: selectedUser.tableID,
           // "tableId": 1, // hardcoded for now
           chatId: currentChatId,
         };
@@ -112,7 +112,7 @@ function Chatbot({
         if (message.toLowerCase().includes("suspicious")) {
           try {
             const response = await api.post("/chatbot/fraudDetection", {
-              tableId: selectedUser.tableId,
+              tableId: selectedUser.tableID,
             });
             const botReponse = response.data.response[0];
             const transactionData = response.data.response[1];

@@ -25,7 +25,7 @@ const Prediction = (
         try {
             const response = await api.post('/analysis/predictIncomeTrend',
                 {
-                    "tableId": selectedUser.tableId
+                    "tableId": selectedUser.tableID
                 });
             setIncomeForecastData(response.data);
             console.log(response.data);
@@ -40,7 +40,7 @@ const Prediction = (
         try {
             const response = await api.post('/analysis/predictExpensesTrend',
                 {
-                    "tableId": selectedUser.tableId
+                    "tableId": selectedUser.tableID
                 });
             setExpenseForecastData(response.data);
             setIsLoading(false);
@@ -54,7 +54,7 @@ const Prediction = (
         try {
             const response = await api.post('/analysis/getIncomeData',
                 {
-                    "tableId": selectedUser.tableId
+                    "tableId": selectedUser.tableID
                 });
             setIncomeActualData(response.data);
             console.log(response.data);
@@ -69,7 +69,7 @@ const Prediction = (
         try {
             const response = await api.post('/analysis/getExpensesData',
                 {
-                    "tableId": selectedUser.tableId
+                    "tableId": selectedUser.tableID
                 });
             setExpenseActualData(response.data);
             setIsLoading(false);

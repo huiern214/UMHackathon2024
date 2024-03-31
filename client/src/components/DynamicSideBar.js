@@ -810,6 +810,7 @@ function DynamicSideBar({
       setAllChat([...allChat, newChat]);
       //open a new chat
       setConversation([]);
+      setCurrentChatId("");
     };
 
     // by tableId
