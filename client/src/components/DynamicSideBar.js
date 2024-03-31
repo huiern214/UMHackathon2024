@@ -679,6 +679,13 @@ function DynamicSideBar({
       "Debts/Overpayments": 31770.46,
       Insurance: 11530,
     }); // Initial dummy data for pie chart
+    const [chartData2, setChartData2] = useState({
+      "Other Expenses": 242385.91,
+      "Government Services": 78652.37,
+      "Utilities": 32814.15,
+      "Debts/Overpayments": 31770.46,
+      "Insurance": 11530
+    }); // Initial dummy data for pie chart
 
     // Define an array of months for the dropdown options
     const months = ["January", "February", "March"];
@@ -695,8 +702,8 @@ function DynamicSideBar({
           "/analysis/categoryExpensesByMonth",
           input
         );
-        console.log(response.data);
-        setChartData(response.data);
+        console.log(response.data.response);
+        setChartData(response.data.response);
       } catch (error) {
         console.error(error);
       }
@@ -713,8 +720,8 @@ function DynamicSideBar({
           "/analysis/paymentMethodExpensesByMonth",
           input
         );
-        console.log(response.data);
-        setChartData(response.data);
+        console.log(response.data.response);
+        setChartData2(response.data.response);
       } catch (error) {
         console.error(error);
       }
@@ -723,7 +730,10 @@ function DynamicSideBar({
     const [modal, setModal] = useState(false);
     const toggleModal = () => setModal(!modal);
 
-    useEffect(() => {}, [selectedMonth1, selectedMonth2]);
+    useEffect(() => {
+      handleMonthChange1({ target: { value: selectedMonth1 } });
+      handleMonthChange2({ target: { value: selectedMonth2 } });
+    }, [selectedMonth1, selectedMonth2]);
 
     return (
       <div className="flex flex-col overflow-y-auto items-center">
@@ -773,7 +783,7 @@ function DynamicSideBar({
         </div>
 
         <div className="mt-5">
-          <h3 className="font-bold">Top 5 Category Expenses by Month</h3>
+          <h3 className="font-bold">Payment Method Expenses by Month</h3>
           <div>
             <label htmlFor="monthSelect2">Select Month:</label>
             <select
@@ -790,11 +800,11 @@ function DynamicSideBar({
                 </option>
               ))}
             </select>
+            </div>
+            <div>
+            <PieChart id="pie2" data={chartData2} />
+            </div>
           </div>
-          <div>
-            <PieChart id="pie2" data={chartData} />
-          </div>
-        </div>
       </div>
     );
   };
