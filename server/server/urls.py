@@ -22,5 +22,4 @@ urlpatterns = [
     path('analysis/', include('analysis.urls')),
     path('transaction/', include('transaction.urls')),
     path('chatbot/', include('chatbot.urls')),
-    path('susDetect/', include('susDetect.urls'))
 ]

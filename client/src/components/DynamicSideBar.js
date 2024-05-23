@@ -21,83 +21,12 @@ function DynamicSideBar({
   setIsFetchData,
 }) {
   const [isUserTransactionDropDown, setIsUserTransactionDropDown] = useState(
-    users.map((user) => ({ name: user.tableName, isDropDown: false }))
+    users.map((user) => ({ name: user.tableName, id: user.tableId, isDropDown: false }))
   );
 
   const [isAddTransaction, setIsAddTransaction] = useState(false);
   const [isShowTransactionTable, setIsShowTransactionTable] = useState(false);
-  const [transactionTableUser, setTransactionTableUser] =
-    useState(selectedUser);
-  // const transactions = [
-  //   {
-  //     transactionID: "TRX20220328123461",
-  //     date: "2024-01-01",
-  //     transactionDetails: "Fund Transfer From Bank Rakyat",
-  //     description: "Transfer of funds from Bank Rakyat",
-  //     category: "Income/Salary",
-  //     paymentMethod: "Bank Transfer",
-  //     withdrawalAmt: 0,
-  //     depositAmt: 100000,
-  //   },
-  //   {
-  //     transactionID: "TRX20220328123467",
-  //     date: "2024-01-01",
-  //     transactionDetails: "fund transfer",
-  //     description: "Transfer of funds from Bank Rakyat",
-  //     category: "income/salary",
-  //     paymentMethod: "Bank Transfer",
-  //     withdrawalAmt: 772.0,
-  //     depositAmt: 1000000,
-  //   },
-  //   {
-  //     transactionID: "000001",
-  //     date: "1-Jan-24",
-  //     transactionDetails: "fund transfer",
-  //     description: "Transfer of funds from Bank Rakyat",
-  //     category: "income/salary",
-  //     paymentMethod: "Bank Transfer",
-  //     withdrawalAmt: 772.0,
-  //     depositAmt: 1000000,
-  //   },
-  //   {
-  //     transactionID: "000001",
-  //     date: "1-Jan-24",
-  //     transactionDetails: "fund transfer",
-  //     description: "Transfer of funds from Bank Rakyat",
-  //     category: "income/salary",
-  //     paymentMethod: "Bank Transfer",
-  //     withdrawalAmt: 772.0,
-  //     depositAmt: 1000000,
-  //   },
-  // ];
-
-  // const [chatHistory, setChatHistory] = useState([
-  //   {
-  //     date: "today",
-  //     title: "1Month Spending",
-  //     content: {},
-  //   },
-  //   {
-  //     date: "today",
-  //     title: "1Month Spending",
-  //     content: {},
-  //   },
-  //   {
-  //     date: "yesterday",
-  //     title: "1Month Spending",
-  //     content: {},
-  //   },
-  //   {
-  //     date: "yesterday",
-  //     title: "1Month Spending",
-  //     content: {},
-  //   },
-  //   {
-  //     date: "This month",
-  //     title: "1Month Spending",
-  //     content: {},
-  //   },
-  // ]);
+  const [transactionTableUser, setTransactionTableUser] = useState({ id: selectedUser.tableID, name: selectedUser.tableName });
 
   const UserTransactionTable = () => {
     const [transactions, setTransactions] = useState([]);
@@ -105,8 +34,9 @@ function DynamicSideBar({
       const fetchTransactions = async () => {
         console.log("fetching transactions");
         try {
+          console.log("transactionTableUser", transactionTableUser);
           const response = await api.get(
-            "transaction/transactions?transactionTableID=1"
+            "transaction/transactions?transactionTableID=" + transactionTableUser.id
           );
           setTransactions(response.data.response);
         } catch (error) {
@@ -169,7 +99,7 @@ function DynamicSideBar({
           <div className="rounded-xl border  border-black flex flex-col bg-gray-50 items-center justify-center p-1">
             <table className="table-auto text-sm text-right rtl:text-right text-gray-500 dark:text-gray-400">
               <caption className="py-3 bg-gray-50 font-semibold text-xl text-black">
-                {transactionTableUser}'s Transactions
+                {transactionTableUser.name}'s Transactions
               </caption>
               <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                 <tr>
@@ -304,15 +234,15 @@ function DynamicSideBar({
                 ))}
               </tbody>
             </table>
-            <div className="flex items-center justify-center">
-              <button
-                className="border border-black bg-white p-2 rounded-md hover:bg-gray-200"
-                onClick={closeTransactionsTable}
-              >
-                Cancel
-              </button>
-            </div>
           </div>
+        </div>
+        <div className="flex items-center justify-center">
+          <button
+            className="border border-black bg-white p-2 rounded-md hover:bg-gray-200"
+            onClick={closeTransactionsTable}
+          >
+            Cancel
+          </button>
         </div>
       </div>
     );
@@ -323,7 +253,7 @@ function DynamicSideBar({
   };
 
   const handleShowTransactionsTable = ({ user }) => {
-    setTransactionTableUser(user.name);
+    setTransactionTableUser({ id: user.id, name: user.name });
     setIsShowTransactionTable(!isShowTransactionTable);
   };
 
@@ -750,7 +680,7 @@ function DynamicSideBar({
             <div className="modal-content absolute h-[700px] w-[900px] bg-[#FFFFFF] overflow-y-auto rounded-lg">
               <Prediction selectedUser={selectedUser} />
               <button
-                className="p-2 border bg-white border-black rounded-xl hover:bg-gray-200"
+                className="p-2 ml-[50%] border bg-white border-black rounded-xl hover:bg-gray-200"
                 onClick={toggleModal}
               >
                 Close

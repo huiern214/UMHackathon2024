@@ -20,14 +20,18 @@ In summary, Quirx is a comprehensive personal finance management solution that c
 4. Integration & Tools: GPT 3.5 (LLM), Prophet (Forecasting ML Model), Langchain (Prompt Engineering)
 
 ## Getting Started
-**Server**  
-1. Open terminal
+**Server**
+1. Get OpenAI API Key and create `server/chatbot/service/config.py` file
+```
+OPENAI_API_KEY = "sk-xxxxxxxxxxx"
+```  
+2. Open terminal
   ```
     cd server
     pip install -r requirements.txt
     python manage.py runserver
   ```
-2. Access the server at `http://localhost:8000`.    
+3. Access the server at `http://localhost:8000`.    
 
 **Client**  
 1. Install [Node.js]("https://nodejs.org/en/download")  

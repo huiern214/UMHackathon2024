@@ -7,8 +7,6 @@ firebase_admin
 Django
 psycopg2
 psycopg2-binary
-supabase_client
-supabase
 matplotlib
 django-cors-headers
 prophet

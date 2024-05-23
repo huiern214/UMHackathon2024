@@ -40,7 +40,6 @@ INSTALLED_APPS = [
     'transaction',
     'analysis',
     'chatbot',
-    'susDetect',
 ]
 
 MIDDLEWARE = [
@@ -83,14 +82,6 @@ WSGI_APPLICATION = 'server.wsgi.application'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'postgres',
-        'USER': "postgres.wupktfazlxaxtjozgjfc",
-        'PASSWORD': "UMH20246thSense",
-        'HOST': "aws-0-ap-southeast-1.pooler.supabase.com",
-        'PORT': "5432"
-    }
 }
 
 

@@ -1,9 +1,7 @@
-# from create_client import create_supabase_client
 from langchain_community.utilities.sql_database import SQLDatabase
 
 def calculate_total_expenses_earnings(transaction_table_id, month):
     year = 2024
-    # supabase = create_supabase_client()
     start_date = f'{year}-{month:02d}-01'
     end_date = f'{year}-{month:02d}-31'  # Assuming 31 days for simplicity
 

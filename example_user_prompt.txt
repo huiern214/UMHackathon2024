@@ -1,0 +1,8 @@
+What are my total expenses from 1/2/2024-29/2/2024?
+Can you show me some transaction records for that, minimum 50 records 
+What is the suspicious data for my transaction?
+Visualize the percentage of my expenses for different categories for the past month
+Show me the distribution of my expenses made via different payment methods
+Which categories do I spend the most on?
+I found out that my expenses are too high, I am over budget every month, can you give me some advice on how to solve this issue (recommendation / personal advice)
+Plot a line graph to show my spending for the past three months
